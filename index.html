@@ -50908,3 +50908,591 @@ checkSession();
 
 </body>
 </html>                
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    KAPNANDA - School Management System
+</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #064e3b,
+            #0f766e,
+            #164e63
+        );
+}
+
+.login-card{
+
+    width:100%;
+    max-width:420px;
+
+    background:#ffffff;
+
+    border-radius:22px;
+
+    padding:32px;
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,.30);
+
+}
+
+.logo{
+
+    width:82px;
+    height:82px;
+
+    margin:
+        0 auto 15px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#0f766e;
+
+    color:white;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+}
+
+h1{
+
+    text-align:center;
+
+    margin:
+        0 0 5px;
+
+    font-size:24px;
+
+    color:#123;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#667085;
+
+    font-size:12px;
+
+    margin-bottom:25px;
+
+}
+
+label{
+
+    display:block;
+
+    margin-top:14px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    color:#344054;
+
+}
+
+input{
+
+    width:100%;
+
+    padding:14px;
+
+    margin-top:6px;
+
+    border:
+        1px solid #d0d5dd;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    outline:none;
+
+}
+
+input:focus{
+
+    border-color:#0f766e;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(15,118,110,.12);
+
+}
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    margin-top:20px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#0f766e;
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    opacity:.9;
+
+}
+
+.message{
+
+    display:none;
+
+    margin-top:15px;
+
+    padding:12px;
+
+    border-radius:9px;
+
+    font-size:12px;
+
+    text-align:center;
+
+}
+
+.message.error{
+
+    display:block;
+
+    background:#fef3f2;
+
+    color:#b42318;
+
+}
+
+.message.success{
+
+    display:block;
+
+    background:#ecfdf3;
+
+    color:#027a48;
+
+}
+
+.loading{
+
+    opacity:.65;
+
+    pointer-events:none;
+
+}
+
+.footer{
+
+    margin-top:20px;
+
+    text-align:center;
+
+    color:#667085;
+
+    font-size:10px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-card">
+
+
+<div class="logo">
+    K
+</div>
+
+
+<h1>
+    KAPNANDA
+</h1>
+
+
+<div class="subtitle">
+    School Management System
+</div>
+
+
+<form
+    id="loginForm"
+>
+
+
+<label>
+    Username
+</label>
+
+<input
+    id="username"
+    type="text"
+    value="KAPNANDA"
+    autocomplete="username"
+    required
+>
+
+
+<label>
+    Password
+</label>
+
+<input
+    id="password"
+    type="password"
+    value="12345"
+    autocomplete="current-password"
+    required
+>
+
+
+<button
+    id="loginButton"
+    type="submit"
+>
+    🔐 OPEN SYSTEM
+</button>
+
+
+<div
+    id="message"
+    class="message"
+></div>
+
+
+</form>
+
+
+<div class="footer">
+
+    Connected to Supabase
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE CONNECTION
+   ========================================================= */
+
+/*
+   IMPORTANT:
+   Replace the URL below with YOUR Supabase Project URL.
+
+   Example:
+
+   https://abcdefghijklmnop.supabase.co
+*/
+
+const SUPABASE_URL =
+    "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+
+
+/*
+   This is the publishable key you previously provided.
+*/
+
+const SUPABASE_KEY =
+    "sb_publishable_D7ox9SH5ssaQH8kNB9DD9Q_zvv4EeOg";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================================================
+   LOGIN DETAILS
+   ========================================================= */
+
+const SYSTEM_USERNAME =
+    "KAPNANDA";
+
+const SYSTEM_PASSWORD =
+    "12345";
+
+
+/* =========================================================
+   CHANGE THIS TO YOUR MAIN SCHOOL SYSTEM FILE
+   ========================================================= */
+
+/*
+   If your main school system is called:
+
+       system.html
+
+   leave this as it is.
+
+   If it is called:
+
+       dashboard.html
+
+   change it to:
+
+       "dashboard.html"
+
+   If your existing system is index.html,
+   rename this login page to login.html and
+   change this to:
+
+       "index.html"
+*/
+
+const SYSTEM_PAGE =
+    "system.html";
+
+
+/* =========================================================
+   MESSAGE FUNCTION
+   ========================================================= */
+
+function showMessage(
+    text,
+    type
+){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+document
+    .getElementById(
+        "loginForm"
+    )
+    .addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+
+            const username =
+                document
+                    .getElementById(
+                        "username"
+                    )
+                    .value
+                    .trim();
+
+
+            const password =
+                document
+                    .getElementById(
+                        "password"
+                    )
+                    .value;
+
+
+            const button =
+                document
+                    .getElementById(
+                        "loginButton"
+                    );
+
+
+            if(
+                username !==
+                SYSTEM_USERNAME
+            ){
+
+                showMessage(
+                    "Incorrect username.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if(
+                password !==
+                SYSTEM_PASSWORD
+            ){
+
+                showMessage(
+                    "Incorrect password.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            button.classList.add(
+                "loading"
+            );
+
+
+            button.textContent =
+                "Opening system...";
+
+
+            showMessage(
+                "Login successful. Opening school system...",
+                "success"
+            );
+
+
+            /*
+             * Give the user a moment to see
+             * the successful login message.
+             */
+
+            setTimeout(
+                function(){
+
+                    window.location.href =
+                        SYSTEM_PAGE;
+
+                },
+                700
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   SUPABASE SESSION CHECK
+   ========================================================= */
+
+async function checkSupabase(){
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .auth
+                .getSession();
+
+
+        if(error){
+
+            console.warn(
+                "Supabase session:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        if(
+            data &&
+            data.session
+        ){
+
+            console.log(
+                "Supabase session detected."
+            );
+
+        }
+
+    }
+    catch(error){
+
+        console.warn(
+            "Supabase connection:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+checkSupabase();
+
+</script>
+
+</body>
+</html>
