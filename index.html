@@ -48912,4 +48912,1999 @@ async function startSecurityListener(){
                     catch(error){
 
                         console.warn(
-                           
+           <!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    Kapnanda Junior School - Secure Login
+</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    background:
+        linear-gradient(
+            135deg,
+            #0f766e,
+            #164e63
+        );
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:430px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:28px;
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.25);
+}
+
+.logo{
+    width:75px;
+    height:75px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    background:#0f766e;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    font-weight:bold;
+}
+
+h1{
+    text-align:center;
+    font-size:22px;
+    margin:5px 0;
+    color:#123;
+}
+
+.subtitle{
+    text-align:center;
+    color:#667085;
+    font-size:12px;
+    margin-bottom:25px;
+}
+
+.tabs{
+    display:flex;
+    gap:5px;
+    margin-bottom:20px;
+}
+
+.tab{
+    flex:1;
+    border:0;
+    padding:10px;
+    border-radius:9px;
+    background:#eef2f4;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:12px;
+}
+
+.tab.active{
+    background:#0f766e;
+    color:white;
+}
+
+label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:12px;
+    color:#344054;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:6px;
+    border:1px solid #d0d5dd;
+    border-radius:9px;
+    outline:none;
+    font-size:14px;
+}
+
+input:focus{
+    border-color:#0f766e;
+    box-shadow:
+        0 0 0 3px
+        rgba(15,118,110,.12);
+}
+
+button{
+    font-family:inherit;
+}
+
+.primary{
+    width:100%;
+    border:0;
+    margin-top:18px;
+    padding:13px;
+    border-radius:9px;
+    background:#0f766e;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary:hover{
+    opacity:.9;
+}
+
+.secondary{
+    width:100%;
+    border:0;
+    margin-top:9px;
+    padding:12px;
+    border-radius:9px;
+    background:#eef2f4;
+    color:#344054;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.link{
+    border:0;
+    background:none;
+    color:#0f766e;
+    cursor:pointer;
+    font-size:12px;
+    margin-top:14px;
+    width:100%;
+}
+
+.message{
+    display:none;
+    padding:11px;
+    margin-bottom:15px;
+    border-radius:8px;
+    font-size:12px;
+}
+
+.message.success{
+    display:block;
+    background:#ecfdf3;
+    color:#027a48;
+}
+
+.message.error{
+    display:block;
+    background:#fef3f2;
+    color:#b42318;
+}
+
+.message.info{
+    display:block;
+    background:#eff8ff;
+    color:#175cd3;
+}
+
+.panel{
+    display:none;
+}
+
+.panel.active{
+    display:block;
+}
+
+.small{
+    font-size:10px;
+    color:#667085;
+    margin-top:10px;
+    line-height:1.5;
+}
+
+.dashboard{
+    display:none;
+    text-align:center;
+}
+
+.dashboard.active{
+    display:block;
+}
+
+.user-box{
+    background:#f8fafc;
+    padding:15px;
+    border-radius:12px;
+    margin:18px 0;
+    text-align:left;
+}
+
+.user-box strong{
+    display:block;
+    margin-bottom:5px;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:10px;
+    background:#ecfdf3;
+    color:#027a48;
+}
+
+.danger{
+    background:#b42318;
+    color:white;
+}
+
+.hidden{
+    display:none !important;
+}
+
+.footer{
+    text-align:center;
+    color:white;
+    font-size:10px;
+    margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="logo">
+    KJS
+</div>
+
+<h1>
+    Kapnanda Junior School
+</h1>
+
+<div class="subtitle">
+    Secure Management System
+</div>
+
+
+<div id="message" class="message"></div>
+
+
+<!-- =====================================================
+     AUTH SECTION
+     ===================================================== -->
+
+<div id="authSection">
+
+<div class="tabs">
+
+<button
+    class="tab active"
+    id="loginTab"
+    onclick="showPanel('login')"
+>
+    Login
+</button>
+
+<button
+    class="tab"
+    id="signupTab"
+    onclick="showPanel('signup')"
+>
+    Sign Up
+</button>
+
+<button
+    class="tab"
+    id="otpTab"
+    onclick="showPanel('otp')"
+>
+    OTP
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     LOGIN
+     ===================================================== -->
+
+<div
+    id="loginPanel"
+    class="panel active"
+>
+
+<label>
+    Email
+</label>
+
+<input
+    id="loginEmail"
+    type="email"
+    value="shadrackkorir636@gmail.com"
+    placeholder="Enter email"
+>
+
+<label>
+    Password
+</label>
+
+<input
+    id="loginPassword"
+    type="password"
+    placeholder="Enter password"
+>
+
+<button
+    class="primary"
+    onclick="login()"
+>
+    🔐 Login
+</button>
+
+<button
+    class="link"
+    onclick="showPanel('reset')"
+>
+    Forgot password?
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     SIGN UP
+     ===================================================== -->
+
+<div
+    id="signupPanel"
+    class="panel"
+>
+
+<label>
+    Full Name
+</label>
+
+<input
+    id="signupName"
+    type="text"
+    placeholder="Full name"
+>
+
+<label>
+    Email
+</label>
+
+<input
+    id="signupEmail"
+    type="email"
+    value="shadrackkorir636@gmail.com"
+    placeholder="Email address"
+>
+
+<label>
+    Phone Number
+</label>
+
+<input
+    id="signupPhone"
+    type="tel"
+    placeholder="0718134443"
+>
+
+<label>
+    Password
+</label>
+
+<input
+    id="signupPassword"
+    type="password"
+    placeholder="Minimum 8 characters"
+>
+
+<label>
+    Confirm Password
+</label>
+
+<input
+    id="signupConfirm"
+    type="password"
+    placeholder="Repeat password"
+>
+
+<button
+    class="primary"
+    onclick="signup()"
+>
+    ✨ Create Account
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     OTP
+     ===================================================== -->
+
+<div
+    id="otpPanel"
+    class="panel"
+>
+
+<label>
+    Phone Number
+</label>
+
+<input
+    id="otpPhone"
+    type="tel"
+    value="0718134443"
+    placeholder="0718134443"
+>
+
+<button
+    class="primary"
+    onclick="sendPhoneOTP()"
+>
+    📱 Send SMS OTP
+</button>
+
+<label>
+    Enter OTP
+</label>
+
+<input
+    id="otpCode"
+    type="text"
+    inputmode="numeric"
+    maxlength="6"
+    placeholder="6 digit code"
+>
+
+<button
+    class="secondary"
+    onclick="verifyPhoneOTP()"
+>
+    ✓ Verify OTP
+</button>
+
+
+<hr
+    style="
+        margin:20px 0;
+        border:0;
+        border-top:1px solid #eee;
+    "
+>
+
+
+<label>
+    Email OTP
+</label>
+
+<input
+    id="emailOTP"
+    type="email"
+    value="shadrackkorir636@gmail.com"
+    placeholder="Email"
+>
+
+<button
+    class="secondary"
+    onclick="sendEmailOTP()"
+>
+    ✉ Send Email OTP
+</button>
+
+<label>
+    Email OTP Code
+</label>
+
+<input
+    id="emailOTPCode"
+    type="text"
+    inputmode="numeric"
+    maxlength="6"
+    placeholder="6 digit code"
+>
+
+<button
+    class="secondary"
+    onclick="verifyEmailOTP()"
+>
+    ✓ Verify Email OTP
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     PASSWORD RESET
+     ===================================================== -->
+
+<div
+    id="resetPanel"
+    class="panel"
+>
+
+<h3>
+    Reset Password
+</h3>
+
+<p class="small">
+    Enter your email address. Supabase will
+    send a secure password reset link.
+</p>
+
+<label>
+    Email
+</label>
+
+<input
+    id="resetEmail"
+    type="email"
+    value="shadrackkorir636@gmail.com"
+>
+
+<button
+    class="primary"
+    onclick="sendResetEmail()"
+>
+    ✉ Send Reset Link
+</button>
+
+<button
+    class="link"
+    onclick="showPanel('login')"
+>
+    ← Back to Login
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     CHANGE PASSWORD
+     ===================================================== -->
+
+<div
+    id="changePasswordPanel"
+    class="panel"
+>
+
+<h3>
+    Change Password
+</h3>
+
+<label>
+    New Password
+</label>
+
+<input
+    id="newPassword"
+    type="password"
+    placeholder="New password"
+>
+
+<label>
+    Confirm New Password
+</label>
+
+<input
+    id="confirmPassword"
+    type="password"
+    placeholder="Confirm password"
+>
+
+<button
+    class="primary"
+    onclick="changePassword()"
+>
+    🔑 Change Password
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     LOGGED IN DASHBOARD
+     ===================================================== -->
+
+<div
+    id="dashboard"
+    class="dashboard"
+>
+
+<h2>
+    Welcome
+</h2>
+
+<div class="user-box">
+
+<strong id="loggedName">
+    User
+</strong>
+
+<div id="loggedEmail">
+    -
+</div>
+
+<br>
+
+<span class="status">
+    ● Authenticated
+</span>
+
+</div>
+
+
+<button
+    class="primary"
+    onclick="showPanel('changePassword')"
+>
+    🔑 Change Password
+</button>
+
+
+<button
+    class="secondary"
+    onclick="showPanel('otp')"
+>
+    📱 Verify Phone / OTP
+</button>
+
+
+<button
+    class="secondary"
+    onclick="logout()"
+>
+    🚪 Logout
+</button>
+
+</div>
+
+
+</div>
+
+
+<div class="footer">
+    Supabase Secure Authentication
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE CONFIGURATION
+   ===================================================== */
+
+/*
+ * IMPORTANT:
+ *
+ * Replace ONLY the URL below.
+ *
+ * Do NOT replace the publishable key with
+ * a service_role or secret key.
+ */
+
+const SUPABASE_URL =
+    "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_D7ox9SH5ssaQH8kNB9DD9Q_zvv4EeOg";
+
+
+const supabase =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+            auth:{
+                persistSession:true,
+                autoRefreshToken:true,
+                detectSessionInUrl:true
+            }
+        }
+    );
+
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+function message(
+    text,
+    type="info"
+){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+
+}
+
+
+/* =====================================================
+   PHONE NORMALIZATION
+   ===================================================== */
+
+function normalizePhone(
+    phone
+){
+
+    let p =
+        String(
+            phone || ""
+        ).replace(
+            /[\s-]/g,
+            ""
+        );
+
+
+    if(
+        /^07\d{8}$/.test(p)
+    ){
+
+        return (
+            "+254" +
+            p.substring(1)
+        );
+
+    }
+
+
+    if(
+        /^01\d{8}$/.test(p)
+    ){
+
+        return (
+            "+254" +
+            p.substring(1)
+        );
+
+    }
+
+
+    if(
+        /^254\d{9}$/.test(p)
+    ){
+
+        return "+" + p;
+
+    }
+
+
+    if(
+        /^\+254\d{9}$/.test(p)
+    ){
+
+        return p;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   SHOW PANELS
+   ===================================================== */
+
+function showPanel(
+    panel
+){
+
+    document
+        .querySelectorAll(
+            ".panel"
+        )
+        .forEach(
+            p =>
+                p.classList.remove(
+                    "active"
+                )
+        );
+
+
+    document
+        .querySelectorAll(
+            ".tab"
+        )
+        .forEach(
+            t =>
+                t.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const target =
+        document.getElementById(
+            panel + "Panel"
+        );
+
+
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    const tab =
+        document.getElementById(
+            panel + "Tab"
+        );
+
+
+    if(tab){
+
+        tab.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if(
+        panel === "changePassword"
+    ){
+
+        document
+            .getElementById(
+                "authSection"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+    }
+
+}
+
+
+/* =====================================================
+   PASSWORD VALIDATION
+   ===================================================== */
+
+function validPassword(
+    password
+){
+
+    return (
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /[0-9]/.test(password)
+    );
+
+}
+
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
+
+async function login(){
+
+    const email =
+        document
+            .getElementById(
+                "loginEmail"
+            )
+            .value
+            .trim();
+
+
+    const password =
+        document
+            .getElementById(
+                "loginPassword"
+            )
+            .value;
+
+
+    if(
+        !email ||
+        !password
+    ){
+
+        message(
+            "Enter your email and password.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Signing in...",
+        "info"
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth
+            .signInWithPassword({
+
+                email:email,
+
+                password:password
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Login successful.",
+        "success"
+    );
+
+
+    displayUser(
+        data.user
+    );
+
+}
+
+
+/* =====================================================
+   SIGN UP
+   ===================================================== */
+
+async function signup(){
+
+    const name =
+        document
+            .getElementById(
+                "signupName"
+            )
+            .value
+            .trim();
+
+
+    const email =
+        document
+            .getElementById(
+                "signupEmail"
+            )
+            .value
+            .trim();
+
+
+    const phoneRaw =
+        document
+            .getElementById(
+                "signupPhone"
+            )
+            .value
+            .trim();
+
+
+    const password =
+        document
+            .getElementById(
+                "signupPassword"
+            )
+            .value;
+
+
+    const confirm =
+        document
+            .getElementById(
+                "signupConfirm"
+            )
+            .value;
+
+
+    if(!email){
+
+        message(
+            "Enter your email.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !validPassword(
+            password
+        )
+    ){
+
+        message(
+            "Password must contain at least 8 characters, an uppercase letter, a lowercase letter and a number.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        password !== confirm
+    ){
+
+        message(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    let phone = null;
+
+
+    if(phoneRaw){
+
+        phone =
+            normalizePhone(
+                phoneRaw
+            );
+
+
+        if(!phone){
+
+            message(
+                "Enter a valid Kenyan phone number.",
+                "error"
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    message(
+        "Creating account...",
+        "info"
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth
+            .signUp({
+
+                email:email,
+
+                password:password,
+
+                options:{
+
+                    data:{
+
+                        full_name:name,
+
+                        phone_number:
+                            phone
+
+                    }
+
+                }
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        data.session
+    ){
+
+        message(
+            "Account created and logged in.",
+            "success"
+        );
+
+
+        displayUser(
+            data.user
+        );
+
+    }
+    else{
+
+        message(
+            "Account created. Check your email to confirm the account before logging in.",
+            "success"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SEND PASSWORD RESET
+   ===================================================== */
+
+async function sendResetEmail(){
+
+    const email =
+        document
+            .getElementById(
+                "resetEmail"
+            )
+            .value
+            .trim();
+
+
+    if(!email){
+
+        message(
+            "Enter your email address.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * The current page is used as the
+     * password-recovery redirect.
+     */
+
+    const redirectURL =
+        window.location.href.split("#")[0];
+
+
+    const {
+        error
+    } =
+        await supabase.auth
+            .resetPasswordForEmail(
+                email,
+                {
+                    redirectTo:
+                        redirectURL
+                }
+            );
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Password reset email sent. Open the email and follow the link.",
+        "success"
+    );
+
+}
+
+
+/* =====================================================
+   CHANGE PASSWORD
+   ===================================================== */
+
+async function changePassword(){
+
+    const password =
+        document
+            .getElementById(
+                "newPassword"
+            )
+            .value;
+
+
+    const confirm =
+        document
+            .getElementById(
+                "confirmPassword"
+            )
+            .value;
+
+
+    if(
+        !validPassword(
+            password
+        )
+    ){
+
+        message(
+            "Password must contain at least 8 characters, an uppercase letter, a lowercase letter and a number.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        password !== confirm
+    ){
+
+        message(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase.auth
+            .updateUser({
+
+                password:password
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Password changed successfully.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "newPassword"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "confirmPassword"
+        )
+        .value = "";
+
+}
+
+
+/* =====================================================
+   SEND PHONE OTP
+   ===================================================== */
+
+async function sendPhoneOTP(){
+
+    const raw =
+        document
+            .getElementById(
+                "otpPhone"
+            )
+            .value
+            .trim();
+
+
+    const phone =
+        normalizePhone(
+            raw
+        );
+
+
+    if(!phone){
+
+        message(
+            "Enter a valid Kenyan phone number.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Sending SMS OTP...",
+        "info"
+    );
+
+
+    const {
+        error
+    } =
+        await supabase.auth
+            .signInWithOtp({
+
+                phone:phone
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "OTP sent to " + phone,
+        "success"
+    );
+
+}
+
+
+/* =====================================================
+   VERIFY PHONE OTP
+   ===================================================== */
+
+async function verifyPhoneOTP(){
+
+    const raw =
+        document
+            .getElementById(
+                "otpPhone"
+            )
+            .value
+            .trim();
+
+
+    const token =
+        document
+            .getElementById(
+                "otpCode"
+            )
+            .value
+            .trim();
+
+
+    const phone =
+        normalizePhone(
+            raw
+        );
+
+
+    if(!phone){
+
+        message(
+            "Enter a valid phone number.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !/^\d{6}$/.test(
+            token
+        )
+    ){
+
+        message(
+            "Enter the 6-digit OTP.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth
+            .verifyOtp({
+
+                phone:phone,
+
+                token:token,
+
+                type:"sms"
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Phone verified successfully.",
+        "success"
+    );
+
+
+    if(
+        data.user
+    ){
+
+        displayUser(
+            data.user
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SEND EMAIL OTP
+   ===================================================== */
+
+async function sendEmailOTP(){
+
+    const email =
+        document
+            .getElementById(
+                "emailOTP"
+            )
+            .value
+            .trim();
+
+
+    if(!email){
+
+        message(
+            "Enter an email address.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase.auth
+            .signInWithOtp({
+
+                email:email,
+
+                options:{
+                    shouldCreateUser:false
+                }
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Email OTP sent.",
+        "success"
+    );
+
+}
+
+
+/* =====================================================
+   VERIFY EMAIL OTP
+   ===================================================== */
+
+async function verifyEmailOTP(){
+
+    const email =
+        document
+            .getElementById(
+                "emailOTP"
+            )
+            .value
+            .trim();
+
+
+    const token =
+        document
+            .getElementById(
+                "emailOTPCode"
+            )
+            .value
+            .trim();
+
+
+    if(!email){
+
+        message(
+            "Enter your email.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !/^\d{6}$/.test(
+            token
+        )
+    ){
+
+        message(
+            "Enter the 6-digit OTP.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth
+            .verifyOtp({
+
+                email:email,
+
+                token:token,
+
+                type:"email"
+
+            });
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    message(
+        "Email verified successfully.",
+        "success"
+    );
+
+
+    if(
+        data.user
+    ){
+
+        displayUser(
+            data.user
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY LOGGED-IN USER
+   ===================================================== */
+
+function displayUser(
+    user
+){
+
+    if(!user){
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "authSection"
+        )
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById(
+            "dashboard"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "loggedEmail"
+        )
+        .textContent =
+        user.email ||
+        user.phone ||
+        "";
+
+
+    document
+        .getElementById(
+            "loggedName"
+        )
+        .textContent =
+        user.user_metadata?.full_name ||
+        "School Administrator";
+
+}
+
+
+/* =====================================================
+   LOGOUT
+   ===================================================== */
+
+async function logout(){
+
+    const {
+        error
+    } =
+        await supabase.auth
+            .signOut();
+
+
+    if(error){
+
+        message(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "dashboard"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "authSection"
+        )
+        .style.display =
+        "block";
+
+
+    document
+        .getElementById(
+            "loginPassword"
+        )
+        .value = "";
+
+
+    showPanel(
+        "login"
+    );
+
+
+    message(
+        "Logged out successfully.",
+        "success"
+    );
+
+}
+
+
+/* =====================================================
+   AUTH STATE LISTENER
+   ===================================================== */
+
+supabase.auth
+    .onAuthStateChange(
+        function(
+            event,
+            session
+        ){
+
+            console.log(
+                "Supabase Auth:",
+                event
+            );
+
+
+            if(
+                session &&
+                session.user
+            ){
+
+                displayUser(
+                    session.user
+                );
+
+            }
+            else{
+
+                document
+                    .getElementById(
+                        "dashboard"
+                    )
+                    .classList.remove(
+                        "active"
+                    );
+
+                document
+                    .getElementById(
+                        "authSection"
+                    )
+                    .style.display =
+                    "block";
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   CHECK EXISTING SESSION
+   ===================================================== */
+
+async function checkSession(){
+
+    const {
+        data,
+        error
+    } =
+        await supabase.auth
+            .getSession();
+
+
+    if(error){
+
+        console.error(
+            error
+        );
+
+        return;
+
+    }
+
+
+    if(
+        data.session &&
+        data.session.user
+    ){
+
+        displayUser(
+            data.session.user
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   PASSWORD RECOVERY DETECTION
+   ===================================================== */
+
+supabase.auth
+    .onAuthStateChange(
+        function(
+            event
+        ){
+
+            if(
+                event ===
+                "PASSWORD_RECOVERY"
+            ){
+
+                document
+                    .getElementById(
+                        "authSection"
+                    )
+                    .style.display =
+                    "block";
+
+
+                document
+                    .querySelectorAll(
+                        ".panel"
+                    )
+                    .forEach(
+                        p =>
+                            p.classList.remove(
+                                "active"
+                            )
+                    );
+
+
+                document
+                    .getElementById(
+                        "changePasswordPanel"
+                    )
+                    .classList.add(
+                        "active"
+                    );
+
+
+                message(
+                    "Enter your new password.",
+                    "info"
+                );
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   START
+   ===================================================== */
+
+checkSession();
+
+</script>
+
+</body>
+</html>                
