@@ -46489,3 +46489,2427 @@ console.log(
     Version 2026.08 FINAL
 
 </footer>
+<!-- =========================================================
+     PART 21 OF 21
+     SUPABASE AUTHENTICATION + PASSWORD + PIN + SMS OTP
+     ========================================================= -->
+
+<script>
+
+/* =========================================================
+   SECURITY CONFIGURATION
+   ========================================================= */
+
+window.SECURITY_SYSTEM = {
+
+    version: "2026.08 SECURITY",
+
+    adminPhone: "0718134443",
+
+    initialized: false,
+
+    otpPending: false,
+
+    pinPending: false
+
+};
+
+
+/* =========================================================
+   SUPABASE AUTH CLIENT CHECK
+   ========================================================= */
+
+function getAuthClient(){
+
+    if(
+        typeof supabaseClient !== "undefined" &&
+        supabaseClient
+    ){
+
+        return supabaseClient;
+
+    }
+
+    /*
+     * If your earlier code named the client
+     * differently, this also checks common names.
+     */
+
+    if(
+        typeof supabase !== "undefined" &&
+        supabase &&
+        typeof supabase.auth !== "undefined"
+    ){
+
+        return supabase;
+
+    }
+
+    return null;
+
+}
+
+
+/* =========================================================
+   SECURITY TOAST
+   ========================================================= */
+
+function securityToast(
+    message,
+    type = "info"
+){
+
+    if(
+        typeof feesToast === "function"
+    ){
+
+        feesToast(
+            message,
+            type
+        );
+
+        return;
+
+    }
+
+
+    let old =
+        document.getElementById(
+            "securityToast"
+        );
+
+
+    if(old){
+
+        old.remove();
+
+    }
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    toast.id =
+        "securityToast";
+
+
+    toast.textContent =
+        message;
+
+
+    toast.style.cssText = `
+
+        position:fixed;
+
+        top:20px;
+
+        right:20px;
+
+        z-index:100000;
+
+        max-width:330px;
+
+        padding:12px 16px;
+
+        border-radius:9px;
+
+        background:
+            ${
+                type === "error"
+                    ? "#b42318"
+                    : type === "success"
+                        ? "#16723a"
+                        : "#344054"
+            };
+
+        color:#fff;
+
+        font-family:Arial,sans-serif;
+
+        font-size:12px;
+
+        box-shadow:
+            0 8px 25px
+            rgba(0,0,0,.20);
+
+    `;
+
+
+    document.body.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.remove();
+
+        },
+        3500
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZE KENYAN PHONE NUMBER
+   ========================================================= */
+
+function normalizeKenyanPhone(
+    phone
+){
+
+    let value =
+        String(
+            phone || ""
+        ).trim();
+
+
+    value =
+        value.replace(
+            /[\s-]/g,
+            ""
+        );
+
+
+    if(
+        /^07\d{8}$/.test(
+            value
+        )
+    ){
+
+        return (
+            "+254" +
+            value.substring(1)
+        );
+
+    }
+
+
+    if(
+        /^01\d{8}$/.test(
+            value
+        )
+    ){
+
+        return (
+            "+254" +
+            value.substring(1)
+        );
+
+    }
+
+
+    if(
+        /^254\d{9}$/.test(
+            value
+        )
+    ){
+
+        return "+" + value;
+
+    }
+
+
+    if(
+        /^\+254\d{9}$/.test(
+            value
+        )
+    ){
+
+        return value;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   PASSWORD VALIDATION
+   ========================================================= */
+
+function validatePassword(
+    password
+){
+
+    if(
+        typeof password !==
+        "string"
+    ){
+
+        return {
+            valid:false,
+            message:"Password is required."
+        };
+
+    }
+
+
+    if(
+        password.length < 8
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Password must contain at least 8 characters."
+        };
+
+    }
+
+
+    if(
+        !/[A-Z]/.test(
+            password
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Password must contain at least one uppercase letter."
+        };
+
+    }
+
+
+    if(
+        !/[a-z]/.test(
+            password
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Password must contain at least one lowercase letter."
+        };
+
+    }
+
+
+    if(
+        !/[0-9]/.test(
+            password
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Password must contain at least one number."
+        };
+
+    }
+
+
+    return {
+        valid:true,
+        message:"Password is strong."
+    };
+
+}
+
+
+/* =========================================================
+   PIN VALIDATION
+   ========================================================= */
+
+function validatePin(
+    pin
+){
+
+    pin =
+        String(
+            pin || ""
+        ).trim();
+
+
+    if(
+        !/^\d{4,6}$/.test(
+            pin
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "PIN must contain 4 to 6 digits."
+        };
+
+    }
+
+
+    /*
+     * Reject very weak PINs.
+     */
+
+    const weakPins = [
+
+        "0000",
+        "1111",
+        "2222",
+        "3333",
+        "4444",
+        "5555",
+        "6666",
+        "7777",
+        "8888",
+        "9999",
+        "1234",
+        "4321"
+
+    ];
+
+
+    if(
+        weakPins.includes(
+            pin
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Choose a stronger PIN."
+        };
+
+    }
+
+
+    return {
+        valid:true,
+        message:"PIN is valid."
+    };
+
+}
+
+
+/* =========================================================
+   SIGN UP WITH EMAIL + PASSWORD
+   ========================================================= */
+
+async function securitySignUp(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const email =
+        (
+            document.getElementById(
+                "securitySignupEmail"
+            )?.value || ""
+        ).trim();
+
+
+    const password =
+        document.getElementById(
+            "securitySignupPassword"
+        )?.value || "";
+
+
+    const confirm =
+        document.getElementById(
+            "securitySignupConfirm"
+        )?.value || "";
+
+
+    const phoneInput =
+        (
+            document.getElementById(
+                "securitySignupPhone"
+            )?.value ||
+            ""
+        ).trim();
+
+
+    if(!email){
+
+        securityToast(
+            "Enter your email address.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const passwordCheck =
+        validatePassword(
+            password
+        );
+
+
+    if(
+        !passwordCheck.valid
+    ){
+
+        securityToast(
+            passwordCheck.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        password !== confirm
+    ){
+
+        securityToast(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    let phone = null;
+
+
+    if(phoneInput){
+
+        phone =
+            normalizeKenyanPhone(
+                phoneInput
+            );
+
+
+        if(!phone){
+
+            securityToast(
+                "Enter a valid Kenyan phone number.",
+                "error"
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await auth.auth.signUp({
+
+                email:email,
+
+                password:password,
+
+                options:{
+                    data:{
+                        phone_number:
+                            phone
+                    }
+                }
+
+            });
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        securityToast(
+            "Account created successfully. Check your email if verification is required.",
+            "success"
+        );
+
+
+        if(
+            phone
+        ){
+
+            await saveSecurityProfile(
+                data.user,
+                phone
+            );
+
+        }
+
+
+        closeSecurityModal();
+
+    }
+    catch(error){
+
+        console.error(
+            "Sign up error:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "Unable to create account.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function securityLogin(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const email =
+        (
+            document.getElementById(
+                "securityLoginEmail"
+            )?.value || ""
+        ).trim();
+
+
+    const password =
+        document.getElementById(
+            "securityLoginPassword"
+        )?.value || "";
+
+
+    if(
+        !email ||
+        !password
+    ){
+
+        securityToast(
+            "Enter email and password.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await auth.auth.signInWithPassword({
+
+                email:email,
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        securityToast(
+            "Login successful.",
+            "success"
+        );
+
+
+        closeSecurityModal();
+
+
+        if(
+            typeof refreshEntireSystem ===
+            "function"
+        ){
+
+            await refreshEntireSystem();
+
+        }
+
+
+        await loadSecurityProfile();
+
+    }
+    catch(error){
+
+        console.error(
+            "Login error:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "Login failed.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+async function securityLogout(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            error
+        } =
+            await auth.auth.signOut();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        securityToast(
+            "You have been logged out.",
+            "success"
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Logout:",
+            error
+        );
+
+
+        securityToast(
+            "Unable to log out.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CHANGE PASSWORD
+   ========================================================= */
+
+async function securityChangePassword(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const password =
+        document.getElementById(
+            "securityNewPassword"
+        )?.value || "";
+
+
+    const confirm =
+        document.getElementById(
+            "securityConfirmPassword"
+        )?.value || "";
+
+
+    const check =
+        validatePassword(
+            password
+        );
+
+
+    if(
+        !check.valid
+    ){
+
+        securityToast(
+            check.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        password !== confirm
+    ){
+
+        securityToast(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            error
+        } =
+            await auth.auth.updateUser({
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        securityToast(
+            "Password changed successfully.",
+            "success"
+        );
+
+
+        closeSecurityModal();
+
+    }
+    catch(error){
+
+        console.error(
+            "Change password:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "Unable to change password.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PASSWORD RESET EMAIL
+   ========================================================= */
+
+async function securityForgotPassword(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const email =
+        (
+            document.getElementById(
+                "securityResetEmail"
+            )?.value || ""
+        ).trim();
+
+
+    if(!email){
+
+        securityToast(
+            "Enter your email address.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const redirect =
+            window.location.origin +
+            window.location.pathname;
+
+
+        const {
+            error
+        } =
+            await auth.auth.resetPasswordForEmail(
+
+                email,
+
+                {
+                    redirectTo:
+                        redirect
+                }
+
+            );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        securityToast(
+            "Password reset instructions have been sent.",
+            "success"
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Password reset:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "Unable to send password reset.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SEND PHONE OTP
+   ========================================================= */
+
+async function sendSecurityOTP(
+    phoneNumber
+){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    const phone =
+        normalizeKenyanPhone(
+            phoneNumber
+        );
+
+
+    if(!phone){
+
+        securityToast(
+            "Enter a valid Kenyan phone number.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    try{
+
+        const {
+            error
+        } =
+            await auth.auth.signInWithOtp({
+
+                phone:phone
+
+            });
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        SECURITY_SYSTEM.otpPending =
+            true;
+
+
+        securityToast(
+            "Verification code sent by SMS.",
+            "success"
+        );
+
+
+        return true;
+
+    }
+    catch(error){
+
+        console.error(
+            "SMS OTP:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "SMS verification could not be started.",
+            "error"
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERIFY PHONE OTP
+   ========================================================= */
+
+async function verifySecurityOTP(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        return false;
+
+    }
+
+
+    const phoneInput =
+        (
+            document.getElementById(
+                "securityOTPPhone"
+            )?.value || ""
+        ).trim();
+
+
+    const token =
+        (
+            document.getElementById(
+                "securityOTPCode"
+            )?.value || ""
+        ).trim();
+
+
+    const phone =
+        normalizeKenyanPhone(
+            phoneInput
+        );
+
+
+    if(!phone){
+
+        securityToast(
+            "Enter a valid phone number.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    if(
+        !/^\d{6}$/.test(
+            token
+        )
+    ){
+
+        securityToast(
+            "Enter the 6-digit verification code.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await auth.auth.verifyOtp({
+
+                phone:phone,
+
+                token:token,
+
+                type:"sms"
+
+            });
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        SECURITY_SYSTEM.otpPending =
+            false;
+
+
+        await saveSecurityProfile(
+            data.user,
+            phone
+        );
+
+
+        securityToast(
+            "Phone number verified successfully.",
+            "success"
+        );
+
+
+        return true;
+
+    }
+    catch(error){
+
+        console.error(
+            "OTP verification:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "Invalid or expired verification code.",
+            "error"
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   SECURITY PROFILE TABLE
+   ========================================================= */
+
+async function saveSecurityProfile(
+    user,
+    phone
+){
+
+    const auth =
+        getAuthClient();
+
+
+    if(
+        !auth ||
+        !user
+    ){
+
+        return;
+
+    }
+
+
+    /*
+     * This expects a table named:
+     *
+     * security_profiles
+     *
+     * Recommended columns:
+     *
+     * id uuid primary key
+     * user_id uuid
+     * phone text
+     * created_at timestamp
+     * updated_at timestamp
+     */
+
+    try{
+
+        const {
+            error
+        } =
+            await auth
+                .from(
+                    "security_profiles"
+                )
+                .upsert({
+
+                    user_id:user.id,
+
+                    phone:phone,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                },{
+                    onConflict:
+                        "user_id"
+
+                });
+
+
+        if(error){
+
+            /*
+             * Do not stop login if the optional
+             * profile table has not yet been
+             * created.
+             */
+
+            console.warn(
+                "Security profile:",
+                error
+            );
+
+        }
+
+    }
+    catch(error){
+
+        console.warn(
+            "Security profile error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD SECURITY PROFILE
+   ========================================================= */
+
+async function loadSecurityProfile(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        return null;
+
+    }
+
+
+    try{
+
+        const {
+            data:{
+                user
+            }
+        } =
+            await auth.auth.getUser();
+
+
+        if(!user){
+
+            return null;
+
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await auth
+                .from(
+                    "security_profiles"
+                )
+                .select("*")
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+        if(error){
+
+            console.warn(
+                "Profile load:",
+                error
+            );
+
+            return null;
+
+        }
+
+
+        return data;
+
+    }
+    catch(error){
+
+        console.warn(
+            "Security profile load:",
+            error
+        );
+
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE / CHANGE PIN
+   ========================================================= */
+
+async function saveSecurityPin(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        securityToast(
+            "Supabase Auth is not connected.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const pin =
+        document.getElementById(
+            "securityNewPin"
+        )?.value || "";
+
+
+    const confirm =
+        document.getElementById(
+            "securityConfirmPin"
+        )?.value || "";
+
+
+    const check =
+        validatePin(
+            pin
+        );
+
+
+    if(
+        !check.valid
+    ){
+
+        securityToast(
+            check.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        pin !== confirm
+    ){
+
+        securityToast(
+            "PINs do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            data:{
+                user
+            }
+        } =
+            await auth.auth.getUser();
+
+
+        if(!user){
+
+            securityToast(
+                "Please log in first.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT store the PIN directly
+         * in the browser or in plain text.
+         *
+         * The secure production approach
+         * is to hash it on a trusted backend/
+         * Edge Function.
+         *
+         * This request sends it to a Supabase
+         * Edge Function named:
+         *
+         * save-pin
+         *
+         */
+
+        const {
+            data,
+            error
+        } =
+            await auth.functions.invoke(
+                "save-pin",
+                {
+                    body:{
+                        pin:pin
+                    }
+                }
+            );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        SECURITY_SYSTEM.pinPending =
+            false;
+
+
+        securityToast(
+            "PIN saved successfully.",
+            "success"
+        );
+
+
+        closeSecurityModal();
+
+    }
+    catch(error){
+
+        console.error(
+            "Save PIN:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "PIN could not be saved. Make sure the save-pin Supabase Edge Function exists.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   VERIFY PIN
+   ========================================================= */
+
+async function verifySecurityPin(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        return false;
+
+    }
+
+
+    const pin =
+        document.getElementById(
+            "securityVerifyPin"
+        )?.value || "";
+
+
+    const check =
+        validatePin(
+            pin
+        );
+
+
+    if(
+        !check.valid
+    ){
+
+        securityToast(
+            check.message,
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await auth.functions.invoke(
+                "verify-pin",
+                {
+                    body:{
+                        pin:pin
+                    }
+                }
+            );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        if(
+            data &&
+            data.verified
+        ){
+
+            securityToast(
+                "PIN verified.",
+                "success"
+            );
+
+
+            return true;
+
+        }
+
+
+        securityToast(
+            "Incorrect PIN.",
+            "error"
+        );
+
+
+        return false;
+
+    }
+    catch(error){
+
+        console.error(
+            "Verify PIN:",
+            error
+        );
+
+
+        securityToast(
+            error.message ||
+            "PIN verification failed.",
+            "error"
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   SECURITY MODAL
+   ========================================================= */
+
+function openSecurityModal(
+    page = "login"
+){
+
+    const old =
+        document.getElementById(
+            "securityModal"
+        );
+
+
+    if(old){
+
+        old.remove();
+
+    }
+
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "securityModal";
+
+
+    modal.style.cssText = `
+
+        position:fixed;
+
+        inset:0;
+
+        z-index:100001;
+
+        background:
+            rgba(0,0,0,.50);
+
+        display:flex;
+
+        justify-content:center;
+
+        align-items:center;
+
+        padding:20px;
+
+    `;
+
+
+    const box =
+        document.createElement(
+            "div"
+        );
+
+
+    box.style.cssText = `
+
+        width:min(460px,100%);
+
+        max-height:90vh;
+
+        overflow:auto;
+
+        background:#fff;
+
+        border-radius:16px;
+
+        padding:22px;
+
+        box-shadow:
+            0 20px 60px
+            rgba(0,0,0,.30);
+
+        font-family:Arial,sans-serif;
+
+    `;
+
+
+    box.innerHTML = `
+
+        <div
+            style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            "
+        >
+
+            <div>
+
+                <h2
+                    style="
+                        margin:0;
+                        font-size:20px;
+                    "
+                >
+                    🔐 Account Security
+                </h2>
+
+                <div
+                    style="
+                        margin-top:4px;
+                        font-size:10px;
+                        color:#667085;
+                    "
+                >
+                    Supabase secure authentication
+                </div>
+
+            </div>
+
+
+            <button
+                class="btn btn-light"
+                onclick="closeSecurityModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div
+            style="
+                display:flex;
+                gap:6px;
+                flex-wrap:wrap;
+                margin-bottom:18px;
+            "
+        >
+
+            <button
+                class="btn btn-light securityTab"
+                data-page="login"
+            >
+                Login
+            </button>
+
+            <button
+                class="btn btn-light securityTab"
+                data-page="signup"
+            >
+                Sign Up
+            </button>
+
+            <button
+                class="btn btn-light securityTab"
+                data-page="password"
+            >
+                Password
+            </button>
+
+            <button
+                class="btn btn-light securityTab"
+                data-page="pin"
+            >
+                PIN
+            </button>
+
+            <button
+                class="btn btn-light securityTab"
+                data-page="sms"
+            >
+                SMS
+            </button>
+
+        </div>
+
+
+        <div
+            id="securityPanel"
+        ></div>
+
+    `;
+
+
+    modal.appendChild(
+        box
+    );
+
+
+    modal.addEventListener(
+        "click",
+        function(event){
+
+            if(
+                event.target ===
+                modal
+            ){
+
+                closeSecurityModal();
+
+            }
+
+        }
+    );
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    box
+        .querySelectorAll(
+            ".securityTab"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function(){
+
+                        renderSecurityPanel(
+                            this.dataset.page
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    renderSecurityPanel(
+        page
+    );
+
+}
+
+
+/* =========================================================
+   RENDER SECURITY PANELS
+   ========================================================= */
+
+function renderSecurityPanel(
+    page
+){
+
+    const panel =
+        document.getElementById(
+            "securityPanel"
+        );
+
+
+    if(!panel){
+
+        return;
+
+    }
+
+
+    if(
+        page === "login"
+    ){
+
+        panel.innerHTML = `
+
+            <label>Email</label>
+
+            <input
+                id="securityLoginEmail"
+                type="email"
+                placeholder="name@example.com"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Password</label>
+
+            <input
+                id="securityLoginPassword"
+                type="password"
+                placeholder="Password"
+                style="width:100%;padding:11px;margin:6px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="securityLogin()"
+            >
+                🔐 Login
+            </button>
+
+
+            <button
+                class="btn btn-light"
+                style="width:100%;margin-top:8px"
+                onclick="
+                    renderSecurityPanel('reset')
+                "
+            >
+                Forgot password?
+            </button>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        page === "signup"
+    ){
+
+        panel.innerHTML = `
+
+            <label>Full Name</label>
+
+            <input
+                id="securitySignupName"
+                type="text"
+                placeholder="Full name"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Email</label>
+
+            <input
+                id="securitySignupEmail"
+                type="email"
+                placeholder="name@example.com"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Phone Number</label>
+
+            <input
+                id="securitySignupPhone"
+                type="tel"
+                placeholder="0718 134 443"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Create Password</label>
+
+            <input
+                id="securitySignupPassword"
+                type="password"
+                placeholder="At least 8 characters"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Confirm Password</label>
+
+            <input
+                id="securitySignupConfirm"
+                type="password"
+                placeholder="Repeat password"
+                style="width:100%;padding:11px;margin:6px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="securitySignUp()"
+            >
+                ✨ Create Account
+            </button>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        page === "password"
+    ){
+
+        panel.innerHTML = `
+
+            <div
+                style="
+                    padding:10px;
+                    background:#f8f9fa;
+                    border-radius:8px;
+                    margin-bottom:14px;
+                    font-size:10px;
+                "
+            >
+                Create a new password or change
+                your existing password.
+            </div>
+
+
+            <label>New Password</label>
+
+            <input
+                id="securityNewPassword"
+                type="password"
+                placeholder="New password"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Confirm New Password</label>
+
+            <input
+                id="securityConfirmPassword"
+                type="password"
+                placeholder="Confirm password"
+                style="width:100%;padding:11px;margin:6px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="securityChangePassword()"
+            >
+                🔑 Change Password
+            </button>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        page === "pin"
+    ){
+
+        panel.innerHTML = `
+
+            <div
+                style="
+                    padding:10px;
+                    background:#fff8e6;
+                    border-radius:8px;
+                    margin-bottom:14px;
+                    font-size:10px;
+                "
+            >
+                Your PIN is protected through
+                Supabase. It should not be stored
+                as plain text in this HTML file.
+            </div>
+
+
+            <label>New PIN</label>
+
+            <input
+                id="securityNewPin"
+                type="password"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="4–6 digit PIN"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <label>Confirm PIN</label>
+
+            <input
+                id="securityConfirmPin"
+                type="password"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="Repeat PIN"
+                style="width:100%;padding:11px;margin:6px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="saveSecurityPin()"
+            >
+                🔢 Save PIN
+            </button>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        page === "sms"
+    ){
+
+        panel.innerHTML = `
+
+            <div
+                style="
+                    padding:10px;
+                    background:#eef6ff;
+                    border-radius:8px;
+                    margin-bottom:14px;
+                    font-size:10px;
+                "
+            >
+                A verification code will be sent
+                to the phone number through your
+                Supabase SMS provider.
+            </div>
+
+
+            <label>Phone Number</label>
+
+            <input
+                id="securityOTPPhone"
+                type="tel"
+                value="${SECURITY_SYSTEM.adminPhone}"
+                placeholder="0718 134 443"
+                style="width:100%;padding:11px;margin:6px 0 12px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%;margin-bottom:14px"
+                onclick="
+                    sendSecurityOTP(
+                        document.getElementById(
+                            'securityOTPPhone'
+                        ).value
+                    )
+                "
+            >
+                📱 Send SMS Code
+            </button>
+
+
+            <label>6-Digit Code</label>
+
+            <input
+                id="securityOTPCode"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="Enter SMS code"
+                style="width:100%;padding:11px;margin:6px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-light"
+                style="width:100%"
+                onclick="verifySecurityOTP()"
+            >
+                ✓ Verify SMS Code
+            </button>
+
+        `;
+
+        return;
+
+    }
+
+
+    if(
+        page === "reset"
+    ){
+
+        panel.innerHTML = `
+
+            <h3
+                style="
+                    margin:0 0 8px;
+                    font-size:15px;
+                "
+            >
+                Reset Password
+            </h3>
+
+
+            <p
+                style="
+                    font-size:10px;
+                    color:#667085;
+                "
+            >
+                Enter your account email and
+                Supabase will send a secure
+                password-reset link.
+            </p>
+
+
+            <input
+                id="securityResetEmail"
+                type="email"
+                placeholder="name@example.com"
+                style="width:100%;padding:11px;margin:8px 0 15px"
+            >
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="securityForgotPassword()"
+            >
+                ✉ Send Reset Link
+            </button>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE SECURITY MODAL
+   ========================================================= */
+
+function closeSecurityModal(){
+
+    const modal =
+        document.getElementById(
+            "securityModal"
+        );
+
+
+    if(modal){
+
+        modal.remove();
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE SECURITY BUTTONS
+   ========================================================= */
+
+function createSecurityButtons(){
+
+    if(
+        document.getElementById(
+            "securityAccountButton"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    const container =
+        document.createElement(
+            "div"
+        );
+
+
+    container.id =
+        "securityAccountControls";
+
+
+    container.style.cssText = `
+
+        position:fixed;
+
+        top:12px;
+
+        right:12px;
+
+        z-index:99997;
+
+        display:flex;
+
+        gap:6px;
+
+    `;
+
+
+    container.innerHTML = `
+
+        <button
+            id="securityAccountButton"
+            class="btn btn-light"
+            onclick="
+                openSecurityModal('login')
+            "
+            title="Account security"
+        >
+            🔐 Account
+        </button>
+
+    `;
+
+
+    document.body.appendChild(
+        container
+    );
+
+}
+
+
+/* =========================================================
+   AUTH SESSION LISTENER
+   ========================================================= */
+
+async function startSecurityListener(){
+
+    const auth =
+        getAuthClient();
+
+
+    if(!auth){
+
+        console.warn(
+            "Supabase Auth client not found."
+        );
+
+        return;
+
+    }
+
+
+    auth.auth.onAuthStateChange(
+        async function(
+            event,
+            session
+        ){
+
+            console.log(
+                "Auth event:",
+                event
+            );
+
+
+            if(session){
+
+                document.body.dataset.loggedIn =
+                    "true";
+
+
+                if(
+                    typeof updateConnectionIndicator ===
+                    "function"
+                ){
+
+                    updateConnectionIndicator();
+
+                }
+
+
+                /*
+                 * Refresh application data
+                 * after login.
+                 */
+
+                if(
+                    typeof refreshEntireSystem ===
+                    "function"
+                ){
+
+                    try{
+
+                        await refreshEntireSystem();
+
+                    }
+                    catch(error){
+
+                        console.warn(
+                           
