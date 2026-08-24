@@ -301,92 +301,263 @@
 
             margin-bottom:
                 25px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        }
+<title>KAPNANDA School Management System</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#064e3b,#0f766e,#164e63);
+    padding:20px;
+}
+
+.login-box{
+    width:100%;
+    max-width:400px;
+    background:white;
+    padding:35px;
+    border-radius:20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.30);
+}
+
+.logo{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background:#0f766e;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 15px;
+    font-size:28px;
+    font-weight:bold;
+}
+
+h1{
+    text-align:center;
+    margin:0;
+    color:#123;
+    font-size:24px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#667085;
+    margin:8px 0 25px;
+    font-size:13px;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+    font-size:13px;
+    color:#344054;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin-top:7px;
+    border:1px solid #d0d5dd;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+}
+
+input:focus{
+    border-color:#0f766e;
+}
+
+button{
+    width:100%;
+    margin-top:22px;
+    padding:14px;
+    border:0;
+    border-radius:10px;
+    background:#0f766e;
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0b5f58;
+}
+
+.error{
+    display:none;
+    margin-top:15px;
+    padding:12px;
+    border-radius:8px;
+    background:#fef3f2;
+    color:#b42318;
+    text-align:center;
+    font-size:13px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#98a2b3;
+    font-size:11px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <div class="logo">
+        K
+    </div>
+
+    <h1>KAPNANDA</h1>
+
+    <div class="subtitle">
+        School Management System
+    </div>
+
+    <form id="loginForm">
+
+        <label for="username">
+            Username
+        </label>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter username"
+            autocomplete="username"
+            required
+        >
+
+        <label for="password">
+            Password
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            required
+        >
+
+        <button type="submit">
+            🔐 LOGIN
+        </button>
+
+        <div id="error" class="error">
+            Incorrect username or password.
+        </div>
+
+    </form>
+
+    <div class="footer">
+        Kapnanda Junior School
+    </div>
+
+</div>
+
+<script>
+
+/* LOGIN DETAILS */
+
+const CORRECT_USERNAME = "KAPNANDA";
+const CORRECT_PASSWORD = "12345";
 
 
-        .login-group {
+/*
+   IMPORTANT:
+   Change this to the filename of your
+   main school management system.
 
-            margin-bottom:
-                15px;
+   Example:
+   "system.html"
+   "dashboard.html"
+   "school.html"
+*/
 
-        }
-
-
-        .login-group label {
-
-            display:
-                block;
-
-            font-size:
-                12px;
-
-            font-weight:
-                700;
-
-            margin-bottom:
-                6px;
-
-        }
+const SCHOOL_SYSTEM = "system.html";
 
 
-        .login-group input {
+document
+.getElementById("loginForm")
+.addEventListener("submit", function(event){
 
-            width:
-                100%;
+    event.preventDefault();
 
-            border:
-                1px solid var(--border);
+    const username =
+        document.getElementById("username").value.trim();
 
-            border-radius:
-                10px;
+    const password =
+        document.getElementById("password").value;
 
-            padding:
-                13px;
-
-            outline:
-                none;
-
-        }
+    const error =
+        document.getElementById("error");
 
 
-        .login-group input:focus {
+    if(
+        username === CORRECT_USERNAME &&
+        password === CORRECT_PASSWORD
+    ){
 
-            border-color:
-                var(--secondary);
+        error.style.display = "none";
 
-            box-shadow:
-                0 0 0 3px
-                rgba(29,111,165,.10);
+        /*
+           Save login temporarily so the
+           school system knows the user logged in.
+        */
 
-        }
+        sessionStorage.setItem(
+            "kapnandaLoggedIn",
+            "true"
+        );
 
-
-        /* =================================================
-           APP LAYOUT
-           ================================================= */
-
-        #app {
-
-            display:
-                none;
-
-            min-height:
-                100vh;
-
-        }
+        sessionStorage.setItem(
+            "kapnandaUsername",
+            username
+        );
 
 
-        .app-layout {
+        /*
+           Open the main school system.
+        */
 
-            display:
-                flex;
+        window.location.href =
+            SCHOOL_SYSTEM;
 
-            min-height:
-                100vh;
+    }
+    else{
 
-        }
+        error.style.display = "block";
 
+    }
+
+});
+
+</script>
+
+</body>
+</html>
 
         /* =================================================
            SIDEBAR
