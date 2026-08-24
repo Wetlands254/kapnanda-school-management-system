@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kapnanda Junior School Management System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+:root{
+ --primary:#075985;
+ --secondary:#0f766e;
+ --green:#15803d;
+ --orange:#ea580c;
+ --red:#dc2626;
+ --purple:#7e22ce;
+ --dark:#0f172a;
+ --light:#f1f5f9;
+ --white:#fff;
+ --border:#e2e8f0;
+}
+body{
+ margin:0;
+ font-family:Arial,Helvetica,sans-serif;
+ background:#f1f5f9;
+ color:#172033;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+ width:250px;
+ background:linear-gradient(180deg,#082f49,#075985);
+ color:white;
+ position:fixed;
+ left:0;
+ top:0;
+ bottom:0;
+ z-index:20;
+ overflow-y:auto;
+}
+.logo{
+ padding:22px 18px;
+ border-bottom:1px solid rgba(255,255,255,.15);
+ text-align:center;
+}
+.logo h1{font-size:20px;margin:8px 0 3px}
+.logo p{font-size:11px;margin:0;opacity:.8}
+.logo-icon{
+ width:60px;height:60px;
+ margin:auto;
+ border-radius:50%;
+ background:white;
+ color:#075985;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:28px;
+ font-weight:bold;
+}
+.nav{padding:14px 10px}
+.nav button{
+ width:100%;
+ background:transparent;
+ color:#dbeafe;
+ border:0;
+ padding:13px 14px;
+ text-align:left;
+ border-radius:9px;
+ margin-bottom:4px;
+ font-size:14px;
+}
+.nav button:hover,.nav button.active{
+ background:rgba(255,255,255,.15);
+ color:white;
+}
+.nav span{display:inline-block;width:28px}
+
+/* MAIN */
+.main{
+ margin-left:250px;
+ width:calc(100% - 250px);
+ min-height:100vh;
+}
+.topbar{
+ height:70px;
+ background:white;
+ border-bottom:1px solid var(--border);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 25px;
+ position:sticky;
+ top:0;
+ z-index:10;
+}
+.topbar h2{margin:0;font-size:20px}
+.menu-btn{
+ display:none;
+ border:0;
+ background:#e2e8f0;
+ padding:8px 12px;
+ border-radius:7px;
+}
+.status{
+ padding:7px 12px;
+ border-radius:20px;
+ background:#dcfce7;
+ color:#166534;
+ font-size:12px;
+}
+.content{padding:25px}
+
+/* CARDS */
+.cards{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:16px;
+ margin-bottom:22px;
+}
+.card{
+ background:white;
+ border:1px solid var(--border);
+ border-radius:14px;
+ padding:20px;
+ box-shadow:0 2px 7px rgba(0,0,0,.04);
+}
+.stat-card{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.stat-icon{
+ width:50px;height:50px;
+ border-radius:12px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:25px;
+}
+.blue{background:#dbeafe;color:#1d4ed8}
+.green{background:#dcfce7;color:#15803d}
+.orange{background:#ffedd5;color:#c2410c}
+.purple{background:#f3e8ff;color:#7e22ce}
+.stat-number{font-size:28px;font-weight:bold;margin-top:5px}
+.stat-label{font-size:12px;color:#64748b}
+
+/* SECTIONS */
+.page{display:none}
+.page.active{display:block}
+.section-title{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:15px;
+}
+.section-title h3{margin:0}
+.btn{
+ border:0;
+ border-radius:8px;
+ padding:10px 15px;
+ font-weight:bold;
+}
+.btn-primary{background:var(--primary);color:white}
+.btn-green{background:var(--green);color:white}
+.btn-orange{background:var(--orange);color:white}
+.btn-red{background:var(--red);color:white}
+.btn-gray{background:#e2e8f0;color:#334155}
+.btn-purple{background:var(--purple);color:white}
+.btn:hover{opacity:.9}
+
+.grid-2{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:18px;
+}
+.grid-3{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:15px;
+}
+
+/* FORMS */
+.form-card{
+ background:white;
+ border:1px solid var(--border);
+ border-radius:14px;
+ padding:20px;
+ margin-bottom:20px;
+}
+.form-grid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:14px;
+}
+.form-group label{
+ display:block;
+ font-size:12px;
+ font-weight:bold;
+ margin-bottom:6px;
+ color:#475569;
+}
+input,select,textarea{
+ width:100%;
+ padding:10px 11px;
+ border:1px solid #cbd5e1;
+ border-radius:7px;
+ background:white;
+ outline:none;
+}
+input:focus,select:focus,textarea:focus{
+ border-color:#0284c7;
+ box-shadow:0 0 0 2px #bae6fd;
+}
+textarea{min-height:100px;resize:vertical}
+.full{grid-column:1/-1}
+.form-actions{
+ margin-top:15px;
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+
+/* TABLE */
+.table-card{
+ background:white;
+ border:1px solid var(--border);
+ border-radius:14px;
+ overflow:hidden;
+}
+.table-head{
+ padding:15px;
+ display:flex;
+ gap:10px;
+ justify-content:space-between;
+ align-items:center;
+ border-bottom:1px solid var(--border);
+}
+.table-wrap{overflow:auto}
+table{
+ width:100%;
+ border-collapse:collapse;
+ min-width:700px;
+}
+th,td{
+ padding:10px 9px;
+ border-bottom:1px solid #e2e8f0;
+ text-align:left;
+ font-size:13px;
+}
+th{
+ background:#f8fafc;
+ color:#334155;
+ font-size:12px;
+}
+tr:hover td{background:#f8fafc}
+.badge{
+ padding:4px 8px;
+ border-radius:20px;
+ font-size:11px;
+ font-weight:bold;
+ display:inline-block;
+}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-purple{background:#f3e8ff;color:#6b21a8}
+
+/* DASHBOARD */
+.hero{
+ background:linear-gradient(135deg,#075985,#0f766e);
+ color:white;
+ border-radius:15px;
+ padding:25px;
+ margin-bottom:20px;
+}
+.hero h2{margin:0 0 8px;font-size:25px}
+.hero p{margin:0;opacity:.9}
+.quick{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+ margin-top:20px;
+}
+.quick button{
+ background:white;
+ color:#0f172a;
+ border:0;
+ padding:14px;
+ border-radius:9px;
+ font-weight:bold;
+}
+
+/* PRINT AREA */
+.print-preview{
+ background:white;
+ padding:30px;
+ border:1px solid #ddd;
+}
+.school-heading{
+ text-align:center;
+ border-bottom:3px solid #075985;
+ padding-bottom:12px;
+ margin-bottom:20px;
+}
+.school-heading h1{margin:0;color:#075985;font-size:25px}
+.school-heading h2{margin:5px 0;font-size:18px}
+.school-heading p{margin:3px;font-size:12px}
+
+/* MODAL */
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.55);
+ display:none;
+ align-items:center;
+ justify-content:center;
+ z-index:100;
+ padding:15px;
+}
+.modal.show{display:flex}
+.modal-box{
+ background:white;
+ width:100%;
+ max-width:650px;
+ max-height:90vh;
+ overflow:auto;
+ border-radius:14px;
+ padding:22px;
+}
+.modal-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:15px;
+}
+.close{
+ background:#fee2e2;
+ border:0;
+ color:#991b1b;
+ border-radius:50%;
+ width:35px;height:35px;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+ .sidebar{
+  transform:translateX(-100%);
+  transition:.25s;
+ }
+ .sidebar.open{transform:translateX(0)}
+ .main{
+  margin-left:0;
+  width:100%;
+ }
+ .menu-btn{display:block}
+ .cards{grid-template-columns:repeat(2,1fr)}
+ .quick{grid-template-columns:repeat(2,1fr)}
+ .grid-3{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .content{padding:13px}
+ .topbar{padding:0 13px}
+ .cards{grid-template-columns:1fr 1fr;gap:8px}
+ .card{padding:13px}
+ .stat-number{font-size:22px}
+ .form-grid,.grid-2{grid-template-columns:1fr}
+ .hero h2{font-size:20px}
+ .quick{grid-template-columns:1fr 1fr}
+}
+
+/* PRINT */
+@media print{
+ body{background:white}
+ .sidebar,.topbar,.no-print{display:none!important}
+ .main{margin:0;width:100%}
+ .content{padding:0}
+ .page{display:none!important}
+ #printArea{display:block!important}
+ .print-preview{border:0;padding:0}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+ <div class="logo">
+   <div class="logo-icon">K</div>
+   <h1>KAPNANDA JUNIOR SCHOOL</h1>
+   <p>SCHOOL MANAGEMENT SYSTEM</p>
+ </div>
+
+ <div class="nav">
+  <button class="active" onclick="showPage('dashboard',this)"><span>🏠</span>Dashboard</button>
+  <button onclick="showPage('learners',this)"><span>👨‍🎓</span>Learners</button>
+  <button onclick="showPage('teachers',this)"><span>👩‍🏫</span>Teachers</button>
+  <button onclick="showPage('fees',this)"><span>💰</span>Fees & Payments</button>
+  <button onclick="showPage('marks',this)"><span>📊</span>Examinations</button>
+  <button onclick="showPage('analysis',this)"><span>📈</span>Exam Analysis</button>
+  <button onclick="showPage('attendance',this)"><span>📅</span>Attendance</button>
+  <button onclick="showPage('newsletter',this)"><span>📰</span>Newsletters</button>
+  <button onclick="showPage('reports',
