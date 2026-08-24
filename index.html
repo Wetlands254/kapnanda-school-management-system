@@ -3,409 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Kapnanda Junior School Management System</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>JSS School Management System</title>
 
 <style>
-*{box-sizing:border-box}
-:root{
- --primary:#075985;
- --secondary:#0f766e;
- --green:#15803d;
- --orange:#ea580c;
- --red:#dc2626;
- --purple:#7e22ce;
- --dark:#0f172a;
- --light:#f1f5f9;
- --white:#fff;
- --border:#e2e8f0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 body{
- margin:0;
- font-family:Arial,Helvetica,sans-serif;
- background:#f1f5f9;
- color:#172033;
+font-family:Arial,Helvetica,sans-serif;
+background:#f4f7fb;
+color:#172033;
 }
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.app{display:flex;min-height:100vh}
-
-/* SIDEBAR */
 .sidebar{
- width:250px;
- background:linear-gradient(180deg,#082f49,#075985);
- color:white;
- position:fixed;
- left:0;
- top:0;
- bottom:0;
- z-index:20;
- overflow-y:auto;
+position:fixed;
+left:0;
+top:0;
+bottom:0;
+width:235px;
+background:#082b49;
+color:white;
+padding:20px 14px;
+overflow-y:auto;
 }
 .logo{
- padding:22px 18px;
- border-bottom:1px solid rgba(255,255,255,.15);
- text-align:center;
+width:48px;height:48px;
+border-radius:12px;
+background:white;color:#082b49;
+display:flex;align-items:center;justify-content:center;
+font-weight:bold;font-size:18px;
 }
-.logo h1{font-size:20px;margin:8px 0 3px}
-.logo p{font-size:11px;margin:0;opacity:.8}
-.logo-icon{
- width:60px;height:60px;
- margin:auto;
- border-radius:50%;
- background:white;
- color:#075985;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:28px;
- font-weight:bold;
-}
-.nav{padding:14px 10px}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:25px}
+.brand h2{font-size:16px}
+.brand small{opacity:.7}
 .nav button{
- width:100%;
- background:transparent;
- color:#dbeafe;
- border:0;
- padding:13px 14px;
- text-align:left;
- border-radius:9px;
- margin-bottom:4px;
- font-size:14px;
+width:100%;
+border:0;
+background:transparent;
+color:#dbe9f5;
+padding:12px;
+margin:3px 0;
+border-radius:9px;
+text-align:left;
+font-weight:bold;
+cursor:pointer;
 }
 .nav button:hover,.nav button.active{
- background:rgba(255,255,255,.15);
- color:white;
+background:#15598b;
+color:white;
 }
-.nav span{display:inline-block;width:28px}
-
-/* MAIN */
 .main{
- margin-left:250px;
- width:calc(100% - 250px);
- min-height:100vh;
+margin-left:235px;
+padding:25px;
 }
-.topbar{
- height:70px;
- background:white;
- border-bottom:1px solid var(--border);
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 25px;
- position:sticky;
- top:0;
- z-index:10;
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
 }
-.topbar h2{margin:0;font-size:20px}
-.menu-btn{
- display:none;
- border:0;
- background:#e2e8f0;
- padding:8px 12px;
- border-radius:7px;
+.top h1{color:#082b49}
+.term{
+background:#dff5e8;
+color:#08743c;
+padding:8px 14px;
+border-radius:20px;
+font-weight:bold;
 }
-.status{
- padding:7px 12px;
- border-radius:20px;
- background:#dcfce7;
- color:#166534;
- font-size:12px;
-}
-.content{padding:25px}
-
-/* CARDS */
-.cards{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:16px;
- margin-bottom:22px;
-}
-.card{
- background:white;
- border:1px solid var(--border);
- border-radius:14px;
- padding:20px;
- box-shadow:0 2px 7px rgba(0,0,0,.04);
-}
-.stat-card{
- display:flex;
- justify-content:space-between;
- align-items:center;
-}
-.stat-icon{
- width:50px;height:50px;
- border-radius:12px;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:25px;
-}
-.blue{background:#dbeafe;color:#1d4ed8}
-.green{background:#dcfce7;color:#15803d}
-.orange{background:#ffedd5;color:#c2410c}
-.purple{background:#f3e8ff;color:#7e22ce}
-.stat-number{font-size:28px;font-weight:bold;margin-top:5px}
-.stat-label{font-size:12px;color:#64748b}
-
-/* SECTIONS */
 .page{display:none}
 .page.active{display:block}
-.section-title{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:15px;
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+gap:15px;
+margin-bottom:20px;
 }
-.section-title h3{margin:0}
-.btn{
- border:0;
- border-radius:8px;
- padding:10px 15px;
- font-weight:bold;
+.card{
+background:white;
+padding:20px;
+border-radius:14px;
+box-shadow:0 3px 12px #0000000d;
+border:1px solid #e2e9f0;
+margin-bottom:20px;
 }
-.btn-primary{background:var(--primary);color:white}
-.btn-green{background:var(--green);color:white}
-.btn-orange{background:var(--orange);color:white}
-.btn-red{background:var(--red);color:white}
-.btn-gray{background:#e2e8f0;color:#334155}
-.btn-purple{background:var(--purple);color:white}
-.btn:hover{opacity:.9}
-
-.grid-2{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:18px;
+.card h3{margin-bottom:8px}
+.stat-number{
+font-size:27px;
+font-weight:bold;
+color:#12629b;
 }
-.grid-3{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:15px;
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
 }
-
-/* FORMS */
-.form-card{
- background:white;
- border:1px solid var(--border);
- border-radius:14px;
- padding:20px;
- margin-bottom:20px;
+button,.btn{
+border:0;
+padding:9px 15px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
 }
-.form-grid{
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:14px;
+.primary{background:#1267a5;color:white}
+.success{background:#078542;color:white}
+.danger{background:#c62828;color:white}
+.warning{background:#e49b16;color:white}
+.light{background:#e9eef4;color:#172033}
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:15px;
 }
-.form-group label{
- display:block;
- font-size:12px;
- font-weight:bold;
- margin-bottom:6px;
- color:#475569;
+input,select{
+padding:10px;
+border:1px solid #ccd7e2;
+border-radius:8px;
+width:100%;
 }
-input,select,textarea{
- width:100%;
- padding:10px 11px;
- border:1px solid #cbd5e1;
- border-radius:7px;
- background:white;
- outline:none;
+.toolbar input,.toolbar select{
+width:auto;
+min-width:180px;
 }
-input:focus,select:focus,textarea:focus{
- border-color:#0284c7;
- box-shadow:0 0 0 2px #bae6fd;
-}
-textarea{min-height:100px;resize:vertical}
-.full{grid-column:1/-1}
-.form-actions{
- margin-top:15px;
- display:flex;
- gap:8px;
- flex-wrap:wrap;
-}
-
-/* TABLE */
-.table-card{
- background:white;
- border:1px solid var(--border);
- border-radius:14px;
- overflow:hidden;
-}
-.table-head{
- padding:15px;
- display:flex;
- gap:10px;
- justify-content:space-between;
- align-items:center;
- border-bottom:1px solid var(--border);
-}
-.table-wrap{overflow:auto}
 table{
- width:100%;
- border-collapse:collapse;
- min-width:700px;
-}
-th,td{
- padding:10px 9px;
- border-bottom:1px solid #e2e8f0;
- text-align:left;
- font-size:13px;
+width:100%;
+border-collapse:collapse;
 }
 th{
- background:#f8fafc;
- color:#334155;
- font-size:12px;
+background:#e8eff6;
+padding:11px;
+text-align:left;
 }
-tr:hover td{background:#f8fafc}
-.badge{
- padding:4px 8px;
- border-radius:20px;
- font-size:11px;
- font-weight:bold;
- display:inline-block;
+td{
+padding:10px;
+border-bottom:1px solid #e5eaf0;
 }
-.badge-green{background:#dcfce7;color:#166534}
-.badge-orange{background:#ffedd5;color:#9a3412}
-.badge-red{background:#fee2e2;color:#991b1b}
-.badge-blue{background:#dbeafe;color:#1e40af}
-.badge-purple{background:#f3e8ff;color:#6b21a8}
-
-/* DASHBOARD */
-.hero{
- background:linear-gradient(135deg,#075985,#0f766e);
- color:white;
- border-radius:15px;
- padding:25px;
- margin-bottom:20px;
-}
-.hero h2{margin:0 0 8px;font-size:25px}
-.hero p{margin:0;opacity:.9}
-.quick{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:12px;
- margin-top:20px;
-}
-.quick button{
- background:white;
- color:#0f172a;
- border:0;
- padding:14px;
- border-radius:9px;
- font-weight:bold;
-}
-
-/* PRINT AREA */
-.print-preview{
- background:white;
- padding:30px;
- border:1px solid #ddd;
-}
-.school-heading{
- text-align:center;
- border-bottom:3px solid #075985;
- padding-bottom:12px;
- margin-bottom:20px;
-}
-.school-heading h1{margin:0;color:#075985;font-size:25px}
-.school-heading h2{margin:5px 0;font-size:18px}
-.school-heading p{margin:3px;font-size:12px}
-
-/* MODAL */
+.table-wrap{overflow-x:auto}
 .modal{
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.55);
- display:none;
- align-items:center;
- justify-content:center;
- z-index:100;
- padding:15px;
+display:none;
+position:fixed;
+inset:0;
+background:#0008;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:100;
 }
 .modal.show{display:flex}
 .modal-box{
- background:white;
- width:100%;
- max-width:650px;
- max-height:90vh;
- overflow:auto;
- border-radius:14px;
- padding:22px;
+background:white;
+width:100%;
+max-width:650px;
+max-height:90vh;
+overflow:auto;
+padding:25px;
+border-radius:16px;
 }
-.modal-header{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:15px;
+.modal-head{
+display:flex;
+justify-content:space-between;
+margin-bottom:18px;
 }
 .close{
- background:#fee2e2;
- border:0;
- color:#991b1b;
- border-radius:50%;
- width:35px;height:35px;
+background:#eee;
+border-radius:50%;
+width:35px;
+height:35px;
+font-size:20px;
 }
-
-/* MOBILE */
-@media(max-width:900px){
- .sidebar{
-  transform:translateX(-100%);
-  transition:.25s;
- }
- .sidebar.open{transform:translateX(0)}
- .main{
-  margin-left:0;
-  width:100%;
- }
- .menu-btn{display:block}
- .cards{grid-template-columns:repeat(2,1fr)}
- .quick{grid-template-columns:repeat(2,1fr)}
- .grid-3{grid-template-columns:1fr}
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
 }
-@media(max-width:600px){
- .content{padding:13px}
- .topbar{padding:0 13px}
- .cards{grid-template-columns:1fr 1fr;gap:8px}
- .card{padding:13px}
- .stat-number{font-size:22px}
- .form-grid,.grid-2{grid-template-columns:1fr}
- .hero h2{font-size:20px}
- .quick{grid-template-columns:1fr 1fr}
+label{
+font-weight:bold;
+font-size:13px;
 }
-
-/* PRINT */
+label input,label select{
+margin-top:5px;
+}
+.progress{
+height:10px;
+background:#e5eaf0;
+border-radius:20px;
+overflow:hidden;
+}
+.progress-bar{
+height:100%;
+background:#1267a5;
+}
+.badge{
+padding:5px 9px;
+border-radius:15px;
+font-size:11px;
+font-weight:bold;
+}
+.paid{background:#d8f4e3;color:#08743c}
+.due{background:#ffe5e5;color:#a71919}
+.partial{background:#fff0cf;color:#8a5c00}
+.print-box{
+background:white;
+padding:25px;
+border:1px solid #ddd;
+}
+.footer{
+text-align:center;
+padding:25px;
+color:#718096;
+}
+@media(max-width:800px){
+.sidebar{width:65px;padding:10px}
+.brand div:not(.logo),.nav b{display:none}
+.main{margin-left:65px;padding:15px}
+.form-grid{grid-template-columns:1fr}
+}
 @media print{
- body{background:white}
- .sidebar,.topbar,.no-print{display:none!important}
- .main{margin:0;width:100%}
- .content{padding:0}
- .page{display:none!important}
- #printArea{display:block!important}
- .print-preview{border:0;padding:0}
+.sidebar,.top,.no-print{display:none!important}
+.main{margin:0;padding:0}
+.page{display:none!important}
+.page.active{display:block!important}
+.card{box-shadow:none;border:0}
+.print-box{border:0}
+body{background:white}
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<aside class="sidebar">
+<div class="brand">
+<div class="logo">JSS</div>
+<div>
+<h2>JSS MANAGEMENT</h2>
+<small>School System</small>
+</div>
+</div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
- <div class="logo">
-   <div class="logo-icon">K</div>
-   <h1>KAPNANDA JUNIOR SCHOOL</h1>
-   <p>SCHOOL MANAGEMENT SYSTEM</p>
- </div>
-
- <div class="nav">
-  <button class="active" onclick="showPage('dashboard',this)"><span>🏠</span>Dashboard</button>
-  <button onclick="showPage('learners',this)"><span>👨‍🎓</span>Learners</button>
-  <button onclick="showPage('teachers',this)"><span>👩‍🏫</span>Teachers</button>
-  <button onclick="showPage('fees',this)"><span>💰</span>Fees & Payments</button>
-  <button onclick="showPage('marks',this)"><span>📊</span>Examinations</button>
-  <button onclick="showPage('analysis',this)"><span>📈</span>Exam Analysis</button>
-  <button onclick="showPage('attendance',this)"><span>📅</span>Attendance</button>
-  <button onclick="showPage('newsletter',this)"><span>📰</span>Newsletters</button>
-  <button onclick="showPage('reports',
+<nav class="nav">
+<button class="active" onclick="showPage('dashboard',this)">📊 <b>Dashboard</b></button>
+<button onclick="showPage('learners',this)">👨‍🎓 <b>Learners</b></button>
+<button onclick="showPage('teachers',this)">👩‍🏫 <b>Teachers</b></button>
+<button onclick="showPage('fees',this)">💰 <b>Fees</b></button>
+<button onclick="showPage('marks',this)">📝 <b>Exams & Marks</b></button>
+<button onclick="showPage('attendance',this)">📅 <b>Attendance</b></button>
+<button onclick="showPage('reports',this)">🖨️ <b>Reports & Printing</b></button>
+<button onclick="showPage('settings',this)">⚙️ <b>Settings</b></
