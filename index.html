@@ -13503,3 +13503,210 @@ function createLearnerReportHTML(
 
 
         <
+ function addLearner(){
+
+    const admissionNo =
+        document.getElementById("admissionNo")?.value.trim();
+
+    const fullName =
+        document.getElementById("fullName")?.value.trim();
+
+    const grade =
+        document.getElementById("learnerGrade")?.value;
+
+    const gender =
+        document.getElementById("learnerGender")?.value || "";
+
+    const guardian =
+        document.getElementById("guardian")?.value.trim() || "";
+
+    const phone =
+        document.getElementById("learnerPhone")?.value.trim() || "";
+
+
+    if(!admissionNo){
+
+        alert("Please enter the admission number.");
+
+        return;
+
+    }
+
+
+    if(!fullName){
+
+        alert("Please enter the learner's full name.");
+
+        return;
+
+    }
+
+
+    if(!grade){
+
+        alert("Please select the learner's grade.");
+
+        return;
+
+    }
+
+
+    /*
+       Prevent duplicate admission numbers
+    */
+
+    const exists =
+        localDB.learners.some(
+            function(learner){
+
+                return String(
+                    learner.admission_no
+                ).toLowerCase()
+                ===
+                String(
+                    admissionNo
+                ).toLowerCase();
+
+            }
+        );
+
+
+    if(exists){
+
+        alert(
+            "A learner with this admission number already exists."
+        );
+
+        return;
+
+    }
+
+
+    const learner = {
+
+        id:
+            Date.now(),
+
+        admission_no:
+            admissionNo,
+
+        full_name:
+            fullName,
+
+        grade:
+            grade,
+
+        gender:
+            gender,
+
+        guardian:
+            guardian,
+
+        phone:
+            phone,
+
+        created_at:
+            new Date().toISOString()
+
+    };
+
+
+    if(!Array.isArray(localDB.learners)){
+
+        localDB.learners = [];
+
+    }
+
+
+    localDB.learners.push(
+        learner
+    );
+
+
+    /*
+       Save to browser storage
+    */
+
+    saveDB();
+
+
+    /*
+       Refresh learner list
+    */
+
+    if(
+        typeof renderLearners === "function"
+    ){
+
+        renderLearners();
+
+    }
+
+
+    /*
+       Refresh dashboard
+    */
+
+    if(
+        typeof renderDashboard === "function"
+    ){
+
+        renderDashboard();
+
+    }
+
+
+    /*
+       Clear form
+    */
+
+    [
+        "admissionNo",
+        "fullName",
+        "guardian",
+        "learnerPhone"
+    ].forEach(
+        function(id){
+
+            const input =
+                document.getElementById(id);
+
+            if(input){
+
+                input.value = "";
+
+            }
+
+        }
+    );
+
+
+    const genderInput =
+        document.getElementById(
+            "learnerGender"
+        );
+
+    if(genderInput){
+
+        genderInput.value = "";
+
+    }
+
+
+    const gradeInput =
+        document.getElementById(
+            "learnerGrade"
+        );
+
+    if(gradeInput){
+
+        gradeInput.value = "";
+
+    }
+
+
+    alert(
+        "Learner added successfully."
+    );
+
+}
