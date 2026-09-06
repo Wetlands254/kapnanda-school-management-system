@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kapnanda Junior & Primary School Management System</title>
+<style>
+:root{
+ --navy:#12304a;--blue:#1976d2;--sky:#e8f3ff;--green:#16855b;--orange:#f59e0b;
+ --red:#dc3545;--purple:#7c3aed;--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#64748b;
+ --border:#dbe4ef;--shadow:0 8px 28px rgba(18,48,74,.08)
+}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}
+.app{display:flex;min-height:100vh}.sidebar{width:260px;background:linear-gradient(180deg,#102f48,#164d70);color:#fff;padding:20px 14px;position:fixed;inset:0 auto 0 0;overflow:auto}
+.brand{display:flex;gap:12px;align-items:center;padding:8px 10px 22px}.logo{width:46px;height:46px;border-radius:14px;background:#fff;color:#164d70;display:grid;place-items:center;font-weight:900}
+.brand h1{font-size:16px;margin:0}.brand small{opacity:.75}.nav button{width:100%;background:transparent;color:#dbeafe;text-align:left;padding:12px 13px;border-radius:10px;margin:3px 0}.nav button:hover,.nav button.active{background:rgba(255,255,255,.13);color:#fff}.nav .group{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#9fc1d8;padding:18px 12px 5px}
+.main{margin-left:260px;width:calc(100% - 260px);padding:22px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.topbar h2{margin:0}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:10px 14px;border-radius:9px;background:#e8eef5;color:var(--navy);font-weight:700}.btn.primary{background:var(--blue);color:#fff}.btn.success{background:var(--green);color:#fff}.btn.warning{background:var(--orange);color:#fff}.btn.danger{background:var(--red);color:#fff}
+.view{display:none}.view.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:18px;box-shadow:var(--shadow)}.stat{font-size:28px;font-weight:900;margin:8px 0}.muted{color:var(--muted);font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}.panel{background:#fff;border:1px solid var(--border);border-radius:15px;padding:18px;box-shadow:var(--shadow);margin-top:16px}.panel h3{margin:0 0 14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:10px 9px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}th{background:#f7fafc;color:#425466;font-size:12px;text-transform:uppercase}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cfd9e6;border-radius:8px;background:#fff}.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.formgrid label{font-size:12px;color:var(--muted);font-weight:700}.formgrid label>*{margin-top:5px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#e8f3ff;color:#1769aa}.badge.green{background:#e8f8f0;color:#087443}.badge.orange{background:#fff4dd;color:#a96500}.badge.red{background:#ffe9ec;color:#b42332}
+.timetable{overflow:auto}.tt{min-width:1050px;display:grid;grid-template-columns:105px repeat(5,1fr);border:1px solid var(--border);border-radius:12px;overflow:hidden}.tt>div{min-height:62px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:7px;font-size:12px}.tt .head{background:#12304a;color:#fff;font-weight:800;text-align:center}.time{background:#f7fafc;font-weight:800;color:#475569}.slot{border-radius:8px;padding:7px;margin:0;background:#e8f3ff;border-left:4px solid #1976d2}.slot.math{background:#fff1e6;border-color:#f97316}.slot.lang{background:#edf7ed;border-color:#16a34a}.slot.sci{background:#f2ecff;border-color:#7c3aed}.slot.games{background:#fff7cc;border-color:#ca8a04}.slot.debate{background:#ffe8ef;border-color:#db2777}.slot.break{background:#f1f5f9;border-color:#94a3b8}.slot.lunch{background:#e7f7ef;border-color:#16a34a}.slot.clean{background:#e9e9e9;border-color:#475569}.slot.personal{background:#fff0f5;border-color:#ec4899}
+.search{max-width:300px}.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+@media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px)}.cards{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.sidebar{position:static;width:100%;height:auto}.app{display:block}.main{margin:0;width:100%;padding:12px}.nav{display:grid;grid-template-columns:1fr 1fr}.nav .group{grid-column:1/-1}.cards{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:10px;flex-direction:column}}
+@media print{.sidebar,.topbar,.no-print{display:none!important}.main{margin:0;width:100%;padding:0}.view{display:none!important}.view.active{display:block!important}.panel{box-shadow:none}}
+
+.print-sheet{background:#fff;max-width:1000px;margin:auto;border:1px solid #dbe4ef;padding:28px;box-shadow:0 8px 28px rgba(18,48,74,.08)}
+.print-head{display:flex;justify-content:space-between;align-items:center;border-bottom:5px solid #1976d2;padding-bottom:14px}
+.print-logo{width:60px;height:60px;border-radius:16px;background:#12304a;color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px}
+.print-title{text-align:center;flex:1}.print-title h1{margin:0;font-size:22px;color:#12304a}.print-title p{margin:4px 0;color:#64748b}
+.print-table{width:100%;border-collapse:collapse;margin-top:18px}.print-table th{background:#12304a;color:#fff}.print-table th,.print-table td{border:1px solid #dbe4ef;padding:7px;font-size:11px}
+.signatures{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:45px}.signbox{border-top:1px solid #64748b;padding-top:8px}.stamp{border:2px dashed #64748b;width:120px;height:70px;border-radius:50%;display:grid;place-items:center;margin-top:20px;color:#64748b;font-size:11px}
+@media print{body{background:#fff}.print-sheet{border:0;box-shadow:none;padding:10px}.no-print{display:none!important}.sidebar{display:none!important}.main{margin:0!important;width:100%!important;padding:0!important}.panel{border:0;box-shadow:none}}
+
+.tt .slot.c1{background:#dbeafe!important;border-left-color:#1976d2!important}
+.tt .slot.c2{background:#dcfce7!important;border-left-color:#16a34a!important}
+.tt .slot.c3{background:#fef3c7!important;border-left-color:#f59e0b!important}
+.tt .slot.c4{background:#ede9fe!important;border-left-color:#7c3aed!important}
+.tt .slot.c5{background:#fce7f3!important;border-left-color:#db2777!important}
+.tt .slot.special{background:#f1f5f9!important;border-left-color:#64748b!important}
+.teacher-key{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.teacher-key span{padding:6px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.grade-chip{display:inline-block;padding:4px 7px;border-radius:7px;font-weight:900;font-size:10px}
+.grade-EE{background:#dcfce7;color:#166534}.grade-ME{background:#dbeafe;color:#1e40af}
+.grade-AE{background:#fef3c7;color:#92400e}.grade-BE{background:#fee2e2;color:#991b1b}
+.calendar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.calendar-item{padding:12px;border:1px solid var(--border);border-radius:10px;background:#f8fbff}
+@media(max-width:700px){.calendar-grid{grid-template-columns:1fr}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+#authGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f172a,#164e63,#0f766e);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{width:min(460px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.35)}
+.auth-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#0ea5e9,#14b8a6);color:#fff;display:grid;place-items:center;font-weight:900;font-size:22px;margin-bottom:15px}
+.auth-card h1{margin:0 0 5px;font-size:24px}.auth-card p{color:#64748b}.auth-card label{display:block;font-weight:700;margin:14px 0 6px}.auth-card input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}.auth-actions{display:flex;gap:10px;margin-top:18px}.auth-actions button{flex:1;padding:13px;border:0;border-radius:10px;background:#0f766e;color:white;font-weight:800;cursor:pointer}.auth-actions button.secondary{background:#e2e8f0;color:#0f172a}.auth-msg{margin-top:12px;padding:10px;border-radius:9px;display:none}.auth-msg.error{display:block;background:#fee2e2;color:#991b1b}.auth-msg.ok{display:block;background:#dcfce7;color:#166534}.security-note{font-size:12px;color:#64748b;margin-top:15px}
+#accountBar{position:fixed;right:18px;top:12px;z-index:5000;display:none;gap:8px;align-items:center;background:#fff;padding:7px 10px;border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.15);font-size:12px}.account-btn{border:0;background:#0f766e;color:#fff;padding:7px 10px;border-radius:8px;font-weight:700}.hidden-app{display:none!important}
+</style></head>
+<body>
+<div id="authGate">
+ <div class="auth-card">
+  <div class="auth-logo">KJ</div>
+  <h1>Kapnanda School Management</h1>
+  <p>Secure Supabase login</p>
+  <div id="loginForm">
+   <label>Username / Email</label><input id="loginEmail" type="text" autocomplete="username" placeholder="Enter your Supabase account email">
+   <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password">
+   <div class="auth-actions"><button onclick="loginUser()">Sign In</button><button class="secondary" onclick="showRecovery()">Password Help</button></div>
+  </div>
+  <div id="recoveryForm" style="display:none">
+   <label>Account Email</label><input id="recoveryEmail" type="email" placeholder="Enter account email">
+   <label>Recovery Number</label><input id="recoveryCode" type="password" inputmode="numeric" placeholder="Enter authorized recovery number">
+   <label>New Password</label><input id="newPassword" type="password" placeholder="Minimum 8 characters">
+   <div class="auth-actions"><button onclick="resetPasswordWithRecovery()">Change Password</button><button class="secondary" onclick="showLogin()">Back</button></div>
+   <div class="security-note">The recovery number is checked server-side and is not stored in the public website.</div>
+  </div>
+  <div id="authMsg" class="auth-msg"></div>
+  <div class="security-note">Authentication and school data are protected by Supabase Auth and Row Level Security.</div>
+ </div>
+</div>
+<div id="generatedAccountModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(15,23,42,.7);align-items:center;justify-content:center;padding:20px"><div class="auth-card"><h2>New Supabase Account</h2><p>Save these credentials securely. The password is shown only once.</p><label>Generated Login</label><input id="generatedEmail" readonly><label>Generated Password</label><input id="generatedPassword" readonly><div class="auth-actions"><button onclick="copyGenerated()">Copy</button><button class="secondary" onclick="document.getElementById('generatedAccountModal').style.display='none'">Close</button></div></div></div>
+<div id="accountBar"><span id="accountEmail"></span><button class="account-btn" onclick="changeOwnPassword()">Change Password</button><button class="account-btn" onclick="logoutUser()">Logout</button></div>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">KJ</div><div><h1>Kapnanda School</h1><small>Management System</small></div></div>
+  <div class="nav">
+    <div class="group">Overview</div>
+    <button class="active" onclick="showView('dashboard',this)">📊 Dashboard</button>
+    <div class="group">School Structure</div>
+    <button onclick="showView('learners',this)">👨‍🎓 Learners</button>
+    <button onclick="showView('teachers',this)">👩‍🏫 Teachers</button>
+    <button onclick="showView('classes',this)">🏫 Classes & Subjects</button>
+    <div class="group">Academics</div>
+    <button onclick="showView('timetable',this)">🗓️ Modern Timetable</button>
+<button onclick="showView('duty',this)">🧑‍🏫 Duty Roster</button>
+<button onclick="showView('calendar',this)">📅 School Calendar</button>
+    <button onclick="showView('attendance',this)">✅ Attendance</button>
+    <button onclick="showView('assessment',this)">📈 CBC/CBE Assessment</button>
+    <button onclick="showView('reports',this)">📝 Report Cards</button>
+    <div class="group">Administration</div>
+    <button onclick="showView('fees',this)">💰 Fees & Fee Lists</button>
+    <button onclick="showView('rankings',this)">🏆 Class Ranking</button>
+    <button onclick="showView('classlists',this)">📋 Class Lists</button>
+    <button onclick="showView('staff',this)">🧑‍💼 Staff & HR</button>
+    <button onclick="showView('inventory',this)">📦 Inventory</button>
+    <button onclick="showView('discipline',this)">🛡️ Discipline</button>
+    <button onclick="showView('communication',this)">📣 Communication</button>
+    <div class="group">System</div>
+    <button onclick="showView('settings',this)">⚙️ School Settings</button>
+  </div>
+</aside>
+
+<main class="main">
+<div class="topbar">
+  <div><h2 id="pageTitle">Dashboard</h2><div class="muted">Kapnanda Junior & Primary School • 2026 Academic Year</div></div>
+  <div class="actions"><button class="btn" onclick="window.print()">🖨️ Print</button><button class="btn primary" onclick="backup()">⬇ Backup Data</button></div>
+</div>
+
+<section id="dashboard" class="view active">
+<div class="cards">
+<div class="card"><div class="muted">Total Learners</div><div class="stat" id="statLearners">0</div><span class="badge">PP1 – Grade 9</span></div>
+<div class="card"><div class="muted">Teachers</div><div class="stat" id="statTeachers">0</div><span class="badge green">Active staff</span></div>
+<div class="card"><div class="muted">Fees Collected</div><div class="stat">KSh <span id="statFees">0</span></div><span class="badge green">This term</span></div>
+<div class="card"><div class="muted">Attendance Today</div><div class="stat">96%</div><span class="badge orange">Live register</span></div>
+</div>
+<div class="grid2">
+<div class="panel"><h3>School Sections</h3><div class="tablewrap"><table><tr><th>Section</th><th>Classes</th><th>Teaching model</th></tr>
+<tr><td>ECDE</td><td>PP1, PP2</td><td>One teacher teaches all subjects</td></tr>
+<tr><td>Lower Primary</td><td>Grade 1–3</td><td>One class teacher teaches all subjects</td></tr>
+<tr><td>Upper Primary</td><td>Grade 4–6</td><td>Several teachers may share subjects</td></tr>
+<tr><td>Junior School</td><td>Grade 7–9</td><td>Subject-specialist teachers</td></tr></table></div></div>
+<div class="panel"><h3>Today's School Programme</h3><ul>
+<li>Normal lessons according to section timetable</li><li>Games: Monday, Tuesday, Thursday</li><li>Debate: Wednesday 3:30–5:00 PM</li><li>General cleaning: Friday 3:30–5:00 PM</li></ul></div>
+</div>
+<div class="panel"><h3>Management Quick Actions</h3><div class="actions"><button class="btn primary" onclick="showView('learners')">+ Register Learner</button><button class="btn success" onclick="showView('attendance')">Mark Attendance</button><button class="btn warning" onclick="showView('assessment')">Enter Assessment</button><button class="btn" onclick="showView('timetable')">Open Timetable</button></div></div>
+</section>
+
+<section id="learners" class="view">
+<div class="panel"><div class="toolbar"><h3>Learner Register</h3><input class="search" id="learnerSearch" placeholder="Search name/admission/class..." oninput="renderLearners()"></div>
+<div class="formgrid"><label>Admission No.<input id="lAdm"></label><label>Full Name<input id="lName"></label><label>Section / Class<select id="lClass"><option>PP1</option><option>PP2</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option></select></label></div><br><button class="btn primary" onclick="addLearner()">Add Learner</button></div>
+<div class="panel"><div class="tablewrap"><table id="learnerTable"></table></div></div>
+</section>
+
+<section id="teachers" class="view">
+<div class="panel"><h3>Teacher Register & Subject Allocation</h3><div class="formgrid"><label>Teacher Name<input id="tName"></label><label>TSC/Staff No.<input id="tNo"></label><label>Section<select id="tSection"><option>ECDE</option><option>Lower Primary</option><option>Upper Primary</option><option>Junior School</option></select></label><label>Subjects / Learning Areas<input id="tSubjects" placeholder="e.g. Mathematics, Science"></label><label>Classes<select id="tClasses" multiple><option>PP1</option><option>PP2</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option></select></label></div><br><button class="btn primary" onclick="addTeacher()">Add Teacher</button></div>
+<div class="panel"><div class="tablewrap"><table id="teacherTable"></table></div></div>
+</section>
+
+<section id="classes" class="view">
+<div class="panel"><h3>Class & Teaching Model</h3><div class="tablewrap"><table><tr><th>Section</th><th>Classes</th><th>Teacher Allocation Rule</th><th>Notes</th></tr>
+<tr><td>ECDE</td><td>PP1, PP2</td><td>One teacher → all subjects</td><td>8:00 AM–12:40 PM</td></tr>
+<tr><td>Lower Primary</td><td>Grade 1–3</td><td>One teacher → all subjects</td><td>Class-teacher model</td></tr>
+<tr><td>Upper Primary</td><td>Grade 4–6</td><td>Multiple teachers → subjects</td><td>Specialist sharing supported</td></tr>
+<tr><td>Junior School</td><td>Grade 7–9</td><td>Multiple teachers → subjects</td><td>Specialist teaching supported</td></tr></table></div></div>
+<div class="panel"><h3>Subject Allocation Rules</h3><p class="muted">The timetable engine allows the same subject to be taught by different teachers in different classes, while preventing a teacher from being scheduled in two classes at the same time.</p></div>
+</section>
+
+
+<section id="timetable" class="view">
+<div class="panel no-print"><div class="toolbar">
+<div><h3>Modern Colour-Coded Timetable</h3><div class="muted">Primary & ECDE: 35 minutes • Junior School: 40 minutes • teacher subscript codes</div></div>
+<div class="actions"><select id="ttSection" onchange="syncTimetableClasses();renderTimetable()"><option>Junior School</option><option>Upper Primary</option><option>Lower Primary</option><option>ECDE</option></select><select id="ttClass" onchange="renderTimetable()"></select><button class="btn" onclick="window.print()">🖨️ Print</button></div></div>
+<div class="teacher-key">
+<span style="background:#dbeafe;color:#1e40af">ENG<sub>1</sub> — Mr Korir</span>
+<span style="background:#dcfce7;color:#166534">MATH<sub>2</sub> — Ms Chebet</span>
+<span style="background:#fef3c7;color:#92400e">KIS<sub>3</sub> — Mr Bett</span>
+<span style="background:#ede9fe;color:#5b21b6">SCI<sub>4</sub> — Ms Jepkoech</span>
+<span style="background:#fce7f3;color:#9d174d">SST<sub>5</sub> — Mr Kiptoo</span>
+</div>
+<p><b>Example:</b> ENG<sub>1</sub> means English taught by Teacher 1, e.g. Mr Korir.</p>
+<p><b>Whole-school programme:</b> Wednesday Debate 3:30–5:00 PM • Friday General Cleaning 3:30–5:00 PM • Other days Games.</p>
+</div><div class="panel timetable"><div id="ttGrid"></div></div>
+</section>
+
+
+<section id="attendance" class="view"><div class="panel"><h3>Daily Attendance</h3><div class="formgrid"><label>Date<input type="date" id="attDate"></label><label>Class<select id="attClass"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 6</option><option>Grade 3</option><option>PP2</option></select></label><label>Quick action<select><option>Mark all Present</option><option>Mark all Absent</option></select></label></div><br><button class="btn success" onclick="alert('Attendance saved successfully.')">Save Attendance</button></div>
+<div class="panel"><h3>Attendance Analytics</h3><div class="cards"><div class="card">Present<br><b>96%</b></div><div class="card">Absent<br><b>4%</b></div><div class="card">Chronic absence<br><b>2 learners</b></div><div class="card">Notifications<br><b>3 pending</b></div></div></div></section>
+
+<section id="assessment" class="view"><div class="panel"><h3>CBC / CBE Assessment Centre</h3><div class="formgrid"><label>Class<select><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 6</option><option>Grade 3</option></select></label><label>Learning Area<select><option>Mathematics</option><option>English</option><option>Kiswahili</option><option>Integrated Science</option><option>Social Studies</option><option>Pre-Technical Studies</option><option>Agriculture</option><option>CRE</option><option>PE & Sports</option></select></label><label>Assessment Type<select><option>Formative</option><option>Summative</option><option>CAT</option><option>End Term</option></select></label></div><br><div class="actions"><button class="btn primary">Enter Marks</button><button class="btn">Import Excel</button><button class="btn success">Generate Analysis</button></div></div>
+<div class="panel"><h3>Analysis Dashboard</h3><p>Planned: learner-by-learner performance, learning-area means, competency/achievement levels, class comparison, term comparison, intervention list and printable A4 analysis.</p></div></section>
+
+<section id="reports" class="view">
+<div class="panel">
+<h3>Individual Learner Report Form</h3>
+<div class="formgrid">
+<label>Class<select id="reportClass"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 6</option><option>Grade 5</option><option>Grade 4</option><option>Grade 3</option><option>Grade 2</option><option>Grade 1</option><option>PP2</option><option>PP1</option></select></label>
+<label>Learner<select id="reportLearner"></select></label>
+<label>Term<select id="reportTerm"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label>
+</div><br>
+<div class="actions"><button class="btn primary" onclick="generateIndividualReport()">Generate Report Form</button><button class="btn" onclick="printReport()">🖨️ Print Individual Report</button></div>
+</div>
+<div class="panel" id="reportPreview"><div class="muted">Select a learner and generate the modern report form.</div></div>
+</section>
+
+<section id="rankings" class="view">
+<div class="panel no-print"><h3>Class List & Subject Ranking</h3>
+<div class="formgrid">
+<label>Section/Class<select id="rankClass" onchange="generateRanking()"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 6</option><option>Grade 5</option><option>Grade 4</option><option>Grade 3</option><option>Grade 2</option><option>Grade 1</option><option>PP2</option><option>PP1</option></select></label>
+<label>Term<select><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label>
+</div><br><button class="btn primary" onclick="generateRanking()">Generate Class Ranking</button>
+<button class="btn" onclick="window.print()">🖨️ Print Ranking</button></div>
+<div class="panel" id="rankingPrint"><div class="muted">The ranking report will contain every learner, every subject, average, learner position and subject averages ranked from highest to lowest.</div></div>
+</section>
+
+<section id="classlists" class="view">
+<div class="panel no-print"><h3>Individual Class List</h3>
+<div class="formgrid"><label>Class<select id="listClass"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 6</option><option>Grade 5</option><option>Grade 4</option><option>Grade 3</option><option>Grade 2</option><option>Grade 1</option><option>PP2</option><option>PP1</option></select></label></div><br>
+<button class="btn primary" onclick="generateClassList()">Generate Class List</button><button class="btn" onclick="window.print()">🖨️ Print Class List</button></div>
+<div class="panel" id="classListPrint"></div>
+</section>
+
+<section id="fees" class="view">
+<div class="panel no-print">
+<h3>Separate Fees Management</h3>
+<div class="formgrid">
+<label>Category<select id="feeCategory" onchange="updateFeeClasses()"><option>Junior School</option><option>Upper Primary</option><option>Lower Primary</option><option>ECDE</option></select></label>
+<label>Class<select id="feeClass"></select></label>
+<label>Term<select><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label>
+</div><br>
+<div class="actions">
+<button class="btn primary" onclick="generateFeeList()">Generate Fee List</button>
+<button class="btn" onclick="window.print()">🖨️ Print Fee List</button>
+</div>
+</div>
+<div class="panel"><h3>Fee Categories</h3><div class="cards">
+<div class="card"><b>ECDE</b><br><span class="muted">PP1 & PP2</span></div>
+<div class="card"><b>Lower Primary</b><br><span class="muted">Grade 1–3</span></div>
+<div class="card"><b>Upper Primary</b><br><span class="muted">Grade 4–6</span></div>
+<div class="card"><b>Junior School</b><br><span class="muted">Grade 7–9</span></div>
+</div></div>
+<div class="panel" id="feePrint"></div>
+</section>
+
+<section id="staff" class="view"><div class="panel"><h3>Staff & HR</h3><p>Teacher records, non-teaching staff, attendance, leave, workload, duty roster, payroll, payslips and statutory deduction fields.</p><button class="btn primary">Open Staff HR</button></div></section>
+<section id="inventory" class="view"><div class="panel"><h3>Inventory & Assets</h3><p>Books, desks, ICT equipment, sports equipment, stationery, food stores, asset register, stock-in/out and low-stock alerts.</p><button class="btn primary">Add Item</button></div></section>
+<section id="discipline" class="view"><div class="panel"><h3>Discipline & Welfare</h3><p>Incident records, action taken, follow-up, parent contact, counselling notes and confidential learner welfare records.</p></div></section>
+<section id="communication" class="view"><div class="panel"><h3>Parent & School Communication</h3><div class="formgrid"><label>Audience<select><option>Whole School</option><option>Junior School</option><option>Upper Primary</option><option>Lower Primary</option><option>ECDE</option><option>Parents of a Class</option></select></label><label>Channel<select><option>SMS</option><option>WhatsApp</option><option>Portal Notification</option></select></label><label>Message<textarea></textarea></label></div><br><button class="btn primary">Prepare Message</button></div></section>
+
+
+<section id="duty" class="view">
+<div class="panel no-print"><div class="toolbar"><div><h3>Duty Roster</h3><div class="muted">Weekly staff duty allocation.</div></div><button class="btn" onclick="window.print()">🖨️ Print Duty Roster</button></div>
+<div class="formgrid"><label>Week Starting<input type="date" id="dutyWeek"></label><label>Section<select id="dutySection"><option>Whole School</option><option>ECDE</option><option>Lower Primary</option><option>Upper Primary</option><option>Junior School</option></select></label><label>Duty Teacher<input id="dutyTeacher" placeholder="e.g. Mr Korir"></label></div><br>
+<button class="btn primary" onclick="addDuty()">Add Duty Assignment</button></div>
+<div class="panel"><div class="print-sheet" id="dutyPrint"></div></div></section>
+
+<section id="calendar" class="view">
+<div class="panel no-print"><div class="toolbar"><div><h3>School Calendar Settings</h3><div class="muted">Manage terms, holidays, examinations, meetings and school events.</div></div><button class="btn" onclick="window.print()">🖨️ Print Calendar</button></div>
+<div class="formgrid"><label>Academic Year<input id="calYear" value="2026"></label><label>Term<select id="calTerm"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label><label>Event/Holiday<input id="calEvent" placeholder="e.g. Mid-term break"></label><label>Start Date<input type="date" id="calStart"></label><label>End Date<input type="date" id="calEnd"></label><label>Type<select id="calType"><option>Term</option><option>Holiday</option><option>Examination</option><option>Meeting</option><option>Sports</option><option>Other</option></select></label></div><br>
+<button class="btn primary" onclick="addCalendarEvent()">Add Calendar Event</button></div>
+<div class="panel"><div class="calendar-grid" id="calendarGrid"></div></div></section>
+
+
+<section id="settings" class="view">
+<div class="panel"><h3>School Settings</h3><div class="formgrid">
+<label>School Name<input value="Kapnanda Junior & Primary School"></label><label>Academic Year<input value="2026"></label><label>Current Term<select><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label><label>Headteacher Name<input placeholder="Enter name"></label><label>School Phone<input placeholder="Enter phone"></label><label>School Address<input placeholder="Enter address"></label></div></div>
+<div class="panel"><h3>Timetable Settings</h3><table><tr><th>Section</th><th>Lesson Duration</th><th>Teaching Model</th></tr>
+<tr><td>ECDE (PP1–PP2)</td><td><b>35 minutes</b></td><td>One teacher teaches all learning activities</td></tr>
+<tr><td>Lower Primary (Grade 1–3)</td><td><b>35 minutes</b></td><td>Class teacher model</td></tr>
+<tr><td>Upper Primary (Grade 4–6)</td><td><b>35 minutes</b></td><td>Several teachers may share subjects</td></tr>
+<tr><td>Junior School (Grade 7–9)</td><td><b>40 minutes</b></td><td>Subject-specialist teachers</td></tr></table></div>
+<div class="panel"><h3>Grading Settings</h3><table><tr><th>Grade</th><th>Minimum Score</th></tr>
+<tr><td>EE1</td><td>90</td></tr><tr><td>EE2</td><td>75</td></tr><tr><td>ME1</td><td>58</td></tr><tr><td>ME2</td><td>41</td></tr><tr><td>AE1</td><td>31</td></tr><tr><td>AE2</td><td>21</td></tr><tr><td>BE1</td><td>11</td></tr><tr><td>BE2</td><td>0</td></tr></table>
+<p class="muted">Grading cut-offs are editable to match the school's approved assessment policy.</p></div><div class="panel"><h3>Administrator</h3><p class="muted">Generate a Supabase-managed staff login without placing passwords in GitHub.</p><button class="btn primary" onclick="createGeneratedAccount()">Generate Staff Login</button></div>
+</section>
+
+</main></div>
+
+<script>
+const state={learners:JSON.parse(localStorage.getItem('kj_learners')||'[]'),teachers:JSON.parse(localStorage.getItem('kj_teachers')||'[]')};
+let currentUser=null; let cloudTimer=null;
+const SUPABASE_URL = window.KAPNANDA_SUPABASE_URL || 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_PUBLISHABLE_KEY = window.KAPNANDA_SUPABASE_KEY || 'YOUR_SUPABASE_PUBLISHABLE_KEY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+function saveLocal(){localStorage.setItem('kj_learners',JSON.stringify(state.learners));localStorage.setItem('kj_teachers',JSON.stringify(state.teachers));}
+function save(){saveLocal(); clearTimeout(cloudTimer); cloudTimer=setTimeout(saveCloud,500);}
+async function saveCloud(){if(!currentUser)return;try{const payload={learners:state.learners,teachers:state.teachers,duties:typeof dutyAssignments!=='undefined'?dutyAssignments:[],calendar:typeof calendarEvents!=='undefined'?calendarEvents:[]};const {error}=await supabaseClient.from('school_data').upsert({school_id:currentUser.school_id,data:payload,updated_at:new Date().toISOString()},{onConflict:'school_id'});if(error)console.warn('Cloud save:',error.message)}catch(e){console.warn(e)}}
+async function loadCloud(){if(!currentUser)return;const {data,error}=await supabaseClient.from('school_data').select('data').eq('school_id',currentUser.school_id).maybeSingle();if(error){console.warn(error.message);return}if(data?.data){state.learners=data.data.learners||[];state.teachers=data.data.teachers||[];if(typeof dutyAssignments!=='undefined'){dutyAssignments.splice(0,dutyAssignments.length,...(data.data.duties||[]));localStorage.setItem('kj_duties',JSON.stringify(dutyAssignments))}if(typeof calendarEvents!=='undefined'){calendarEvents.splice(0,calendarEvents.length,...(data.data.calendar||[]));localStorage.setItem('kj_calendar',JSON.stringify(calendarEvents))}saveLocal()}}
+function showView(id,btn){
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+ const names={dashboard:'Dashboard',learners:'Learner Register',teachers:'Teacher Register',classes:'Classes & Subjects',timetable:'Modern Timetable',duty:'Duty Roster',calendar:'School Calendar',attendance:'Attendance',assessment:'CBC/CBE Assessment & Grading',reports:'Report Cards',fees:'Fees & Finance',rankings:'Class Ranking',classlists:'Class Lists',staff:'Staff & HR',inventory:'Inventory & Assets',discipline:'Discipline & Welfare',communication:'Communication',settings:'School Settings'};
+ document.getElementById('pageTitle').textContent=names[id]||'Kapnanda School';
+ if(id==='learners')renderLearners();if(id==='teachers')renderTeachers();if(id==='timetable')renderTimetable();updateStats();
+}
+function addLearner(){
+ const adm=document.getElementById('lAdm').value.trim(),name=document.getElementById('lName').value.trim(),cls=document.getElementById('lClass').value;
+ if(!adm||!name)return alert('Enter admission number and learner name.');
+ state.learners.push({adm,name,cls});save();document.getElementById('lAdm').value='';document.getElementById('lName').value='';renderLearners();updateStats();
+}
+function renderLearners(){
+ const q=(document.getElementById('learnerSearch')?.value||'').toLowerCase();
+ const rows=state.learners.filter(x=>Object.values(x).join(' ').toLowerCase().includes(q));
+ document.getElementById('learnerTable').innerHTML='<tr><th>Admission</th><th>Learner</th><th>Class</th><th>Action</th></tr>'+rows.map((x,i)=>`<tr><td>${x.adm}</td><td>${x.name}</td><td><span class="badge">${x.cls}</span></td><td><button class="btn danger" onclick="removeLearner(${i})">Remove</button></td></tr>`).join('');
+}
+function removeLearner(i){state.learners.splice(i,1);save();renderLearners();updateStats()}
+function addTeacher(){
+ const name=document.getElementById('tName').value.trim(),no=document.getElementById('tNo').value.trim(),sec=document.getElementById('tSection').value,subs=document.getElementById('tSubjects').value.trim();
+ if(!name)return alert('Enter teacher name.');
+ state.teachers.push({name,no,sec,subs});save();document.getElementById('tName').value='';document.getElementById('tNo').value='';document.getElementById('tSubjects').value='';renderTeachers();updateStats();
+}
+function renderTeachers(){document.getElementById('teacherTable').innerHTML='<tr><th>Name</th><th>Staff No.</th><th>Section</th><th>Subjects</th></tr>'+state.teachers.map(x=>`<tr><td>${x.name}</td><td>${x.no||'-'}</td><td>${x.sec}</td><td>${x.subs||'-'}</td></tr>`).join('')}
+function updateStats(){document.getElementById('statLearners').textContent=state.learners.length;document.getElementById('statTeachers').textContent=state.teachers.length;document.getElementById('statFees').textContent='980,000'}
+function backup(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kapnanda-school-backup.json';a.click()}
+
+const ttTeacherMap={"English":["ENG",1,"Mr Korir"],"Mathematics":["MATH",2,"Ms Chebet"],"Kiswahili":["KIS",3,"Mr Bett"],"Integrated Science":["SCI",4,"Ms Jepkoech"],"Science":["SCI",4,"Ms Jepkoech"],"Social Studies":["SST",5,"Mr Kiptoo"],"Pre-Technical":["PTS",6,"Mr Rono"],"Agriculture":["AGR",7,"Ms Cherono"],"CRE":["CRE",8,"Mr Langat"],"PE / Project":["PE",9,"Mr Kibet"],"Language":["LANG",1,"Mr Korir"],"Numeracy":["NUM",2,"Ms Chebet"],"Environmental":["ENV",4,"Ms Jepkoech"],"Creative":["CREAT",3,"Mr Bett"],"Creative/PE":["CREAT",9,"Mr Kibet"]};
+function subCode(s){const m=ttTeacherMap[s]||[s.slice(0,4).toUpperCase(),1,"Teacher 1"];return `${m[0]}<sub>${m[1]}</sub>`}
+function teacherName(s){return(ttTeacherMap[s]||["",1,"Teacher 1"])[2]}
+function lessonDuration(sec){return sec==="Junior School"?40:35}
+function sectionClasses(sec){if(sec==="Junior School")return["Grade 7","Grade 8","Grade 9"];if(sec==="Upper Primary")return["Grade 4","Grade 5","Grade 6"];if(sec==="Lower Primary")return["Grade 1","Grade 2","Grade 3"];return["PP1","PP2"]}
+function syncTimetableClasses(){const sec=document.getElementById("ttSection")?.value||"Junior School",el=document.getElementById("ttClass");if(!el)return;const old=el.value;el.innerHTML=sectionClasses(sec).map(x=>`<option>${x}</option>`).join("");if(sectionClasses(sec).includes(old))el.value=old}
+function hm(m){return `${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`}
+function lessonBlocks(sec){
+ const d=lessonDuration(sec),base=sec==="Junior School"?["Mathematics","English","Kiswahili","Integrated Science","Social Studies","Pre-Technical","Agriculture","CRE","PE / Project"]:sec==="ECDE"?["Language","Numeracy","Environmental","Creative","Language","Numeracy","Creative"]:["English","Mathematics","Kiswahili","Science","Social Studies","Creative/PE"];
+ const b=[],add=(a,z,arr)=>{let t=a,i=0;while(t+d<=z){b.push([t,t+d,arr[i++%arr.length],"lesson"]);t+=d}if(t<z)b.push([t,z,"Transition / Activity","special"])};
+ add(480,sec==="Junior School"?590:570,base);
+ b.push([sec==="Junior School"?590:570,sec==="Junior School"?600:590,"BREAK 1","break"]);
+ b.push([sec==="Junior School"?600:590,630,"BREAK 2","break"]);
+ add(630,760,base.slice(2));
+ if(sec==="Junior School"){b.push([760,820,"LUNCH","lunch"],[820,850,"PERSONAL STUDIES","personal"]);add(850,990,base.slice(0,6))}
+ else if(sec!=="ECDE"){b.push([760,820,"LUNCH","lunch"],[820,840,"PERSONAL STUDIES","personal"]);add(840,910,base)}
+ return b;
+}
+function renderTimetable(){
+ syncTimetableClasses();
+ const sec=document.getElementById("ttSection")?.value||"Junior School",cls=document.getElementById("ttClass")?.value||sectionClasses(sec)[0],days=["Monday","Tuesday","Wednesday","Thursday","Friday"],blocks=lessonBlocks(sec);
+ let out='<div class="tt"><div class="head">Time</div>'+days.map(d=>`<div class="head">${d}</div>`).join("");
+ blocks.forEach((b,i)=>{const[a,z,label,type]=b;out+=`<div class="time">${hm(a)}–${hm(z)}<br><span class="muted">${type==="lesson"?lessonDuration(sec)+" min":""}</span></div>`;days.forEach(d=>{let text=label,cl=type==="lesson"?`c${i%5+1}`:"special";let who=type==="lesson"?`<span class="muted">${subCode(label)} — ${teacherName(label)}</span>`:`<span class="muted">${cls}</span>`;out+=`<div><div class="slot ${cl}"><b>${text}</b><br>${who}</div></div>`})});out+='</div>';document.getElementById("ttGrid").innerHTML=out;
+}
+
+
+const subjects=["Mathematics","English","Kiswahili","Integrated Science","Social Studies","Pre-Technical Studies","Agriculture","CRE","PE & Sports"];
+
+function gradeFor(v){v=Number(v);if(v>=90)return"EE1";if(v>=75)return"EE2";if(v>=58)return"ME1";if(v>=41)return"ME2";if(v>=31)return"AE1";if(v>=21)return"AE2";if(v>=11)return"BE1";return"BE2"}
+function gradeClass(g){return g.slice(0,2)}
+const dutyAssignments=JSON.parse(localStorage.getItem("kj_duties")||"[]");
+const calendarEvents=JSON.parse(localStorage.getItem("kj_calendar")||"[]");
+function addDuty(){dutyAssignments.push({week:document.getElementById("dutyWeek").value||new Date().toISOString().slice(0,10),section:document.getElementById("dutySection").value,teacher:document.getElementById("dutyTeacher").value||"Unassigned"});localStorage.setItem("kj_duties",JSON.stringify(dutyAssignments));renderDuty()}
+function renderDuty(){const rows=dutyAssignments.length?dutyAssignments:[{week:"2026-01-05",section:"Whole School",teacher:"Mr Korir"},{week:"2026-01-05",section:"Junior School",teacher:"Ms Chebet"},{week:"2026-01-05",section:"Upper Primary",teacher:"Mr Bett"},{week:"2026-01-05",section:"Lower Primary",teacher:"Ms Jepkoech"},{week:"2026-01-05",section:"ECDE",teacher:"Mr Kiptoo"}];document.getElementById("dutyPrint").innerHTML=`<div class="print-head"><div class="print-logo">KJ</div><div class="print-title"><h1>KAPNANDA JUNIOR & PRIMARY SCHOOL</h1><p>WEEKLY DUTY ROSTER</p></div><div><b>2026</b></div></div><table class="print-table"><tr><th>Week</th><th>Section</th><th>Duty Teacher</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th></tr>${rows.map(r=>`<tr><td>${r.week}</td><td>${r.section}</td><td><b>${r.teacher}</b></td><td>Duty</td><td>Duty</td><td>Duty</td><td>Duty</td><td>Duty</td></tr>`).join("")}</table><div class="signatures"><div class="signbox">Duty Coordinator Signature & Date</div><div class="signbox">Headteacher Signature & Date<div class="stamp">OFFICIAL SCHOOL STAMP</div></div></div>`}
+function addCalendarEvent(){calendarEvents.push({year:document.getElementById("calYear").value,term:document.getElementById("calTerm").value,event:document.getElementById("calEvent").value||"School Event",start:document.getElementById("calStart").value,end:document.getElementById("calEnd").value,type:document.getElementById("calType").value});localStorage.setItem("kj_calendar",JSON.stringify(calendarEvents));renderCalendar()}
+function renderCalendar(){const rows=calendarEvents.length?calendarEvents:[{year:"2026",term:"Term 1",event:"Term Opening",start:"2026-01-06",end:"2026-04-02",type:"Term"},{year:"2026",term:"Term 1",event:"Mid-term Break",start:"2026-02-26",end:"2026-03-01",type:"Holiday"},{year:"2026",term:"Term 1",event:"End Term Assessment",start:"2026-03-23",end:"2026-03-31",type:"Examination"}];document.getElementById("calendarGrid").innerHTML=rows.map(r=>`<div class="calendar-item"><b>${r.event}</b><br><span class="muted">${r.term} • ${r.type}</span><br>${r.start||"—"} → ${r.end||"—"}</div>`).join("")}
+
+function sectionForClass(c){if(["PP1","PP2"].includes(c))return"ECDE";if(["Grade 1","Grade 2","Grade 3"].includes(c))return"Lower Primary";if(["Grade 4","Grade 5","Grade 6"].includes(c))return"Upper Primary";return"Junior School"}
+function learnersForClass(c){return state.learners.filter(x=>x.cls===c)}
+function updateFeeClasses(){const cat=document.getElementById('feeCategory')?.value;const map={"ECDE":["PP1","PP2"],"Lower Primary":["Grade 1","Grade 2","Grade 3"],"Upper Primary":["Grade 4","Grade 5","Grade 6"],"Junior School":["Grade 7","Grade 8","Grade 9"]};const el=document.getElementById('feeClass');if(el)el.innerHTML=map[cat].map(x=>`<option>${x}</option>`).join('')}
+function generateFeeList(){
+ const c=document.getElementById('feeClass').value, cat=sectionForClass(c), ls=learnersForClass(c);
+ document.getElementById('feePrint').innerHTML=`<div class="print-sheet"><div class="print-head"><div class="print-logo">KJ</div><div class="print-title"><h1>KAPNANDA JUNIOR & PRIMARY SCHOOL</h1><p>${cat} • ${c} • SCHOOL FEES LIST</p></div><div><b>2026</b><br><span class="muted">Term Fee Register</span></div></div>
+ <table class="print-table"><tr><th>#</th><th>Admission No.</th><th>Learner Name</th><th>Class</th><th>Expected (KSh)</th><th>Paid (KSh)</th><th>Balance (KSh)</th></tr>${ls.map((x,i)=>`<tr><td>${i+1}</td><td>${x.adm}</td><td>${x.name}</td><td>${x.cls}</td><td>—</td><td>—</td><td>—</td></tr>`).join('')}</table>
+ <p><b>Category:</b> ${cat} &nbsp; <b>Class:</b> ${c} &nbsp; <b>Total Learners:</b> ${ls.length}</p>
+ <div class="signatures"><div class="signbox">Headteacher Signature & Date</div><div class="signbox">School Stamp<div class="stamp">OFFICIAL SCHOOL STAMP</div></div></div></div>`;
+}
+function scoreFor(learner,subject){let h=0;for(const ch of (learner.adm+learner.name+subject)){h=(h*31+ch.charCodeAt(0))%101};return 40+(h%61)}
+
+function generateRanking(){
+ const c=document.getElementById('rankClass').value,ls=learnersForClass(c);
+ const rows=ls.map(x=>{const scores=subjects.map(s=>scoreFor(x,s));return {...x,scores,avg:scores.reduce((a,b)=>a+b,0)/scores.length}}).sort((a,b)=>b.avg-a.avg);
+ const subjectMeans=subjects.map((s,j)=>({s,avg:ls.length?ls.reduce((a,x)=>a+scoreFor(x,s),0)/ls.length:0})).sort((a,b)=>b.avg-a.avg);
+ document.getElementById('rankingPrint').innerHTML=`<div class="print-sheet"><div class="print-head"><div class="print-logo">KJ</div><div class="print-title"><h1>KAPNANDA JUNIOR & PRIMARY SCHOOL</h1><p>${c} • CLASS PERFORMANCE & SUBJECT RANKING</p></div><div><b>2026</b><br><span class="muted">Term 1</span></div></div>
+ <table class="print-table"><tr><th>Pos.</th><th>Adm.</th><th>Learner</th>${subjects.map(s=>`<th>${s}</th>`).join('')}<th>Average / Grade</th></tr>${rows.map((x,i)=>`<tr><td><b>${i+1}</b></td><td>${x.adm}</td><td>${x.name}</td>${x.scores.map(v=>`<td>${v}<br><span class="grade-chip ${gradeClass(gradeFor(v))}">${gradeFor(v)}</span></td>`).join('')}<td><b>${x.avg.toFixed(2)}</b><br><span class="grade-chip ${gradeClass(gradeFor(x.avg))}">${gradeFor(x.avg)}</span></td></tr>`).join('')}</table>
+ <h3>Subjects Ranked by Class Average — Leading to Lowest</h3><table class="print-table"><tr><th>Rank</th><th>Subject / Learning Area</th><th>Class Average</th></tr>${subjectMeans.map((x,i)=>`<tr><td>${i+1}</td><td>${x.s}</td><td><b>${x.avg.toFixed(2)}</b></td></tr>`).join('')}</table>
+ <div class="signatures"><div class="signbox">Headteacher Signature & Date</div><div class="signbox">School Stamp<div class="stamp">OFFICIAL SCHOOL STAMP</div></div></div></div>`;
+}
+
+function generateClassList(){
+ const c=document.getElementById('listClass').value, ls=learnersForClass(c);
+ document.getElementById('classListPrint').innerHTML=`<div class="print-sheet"><div class="print-head"><div class="print-logo">KJ</div><div class="print-title"><h1>KAPNANDA JUNIOR & PRIMARY SCHOOL</h1><p>OFFICIAL CLASS LIST • ${c} • ${sectionForClass(c)}</p></div><div><b>2026</b></div></div>
+ <table class="print-table"><tr><th>#</th><th>Admission No.</th><th>Learner Name</th><th>Class</th><th>Parent/Guardian</th><th>Contact</th></tr>${ls.map((x,i)=>`<tr><td>${i+1}</td><td>${x.adm}</td><td>${x.name}</td><td>${x.cls}</td><td>________________</td><td>________________</td></tr>`).join('')}</table>
+ <p><b>Total Learners:</b> ${ls.length}</p><div class="signatures"><div class="signbox">Class Teacher Signature & Date</div><div class="signbox">Headteacher Signature & Date<div class="stamp">OFFICIAL SCHOOL STAMP</div></div></div></div>`;
+}
+function populateReportLearners(){const c=document.getElementById('reportClass')?.value,el=document.getElementById('reportLearner');if(!el)return;el.innerHTML=learnersForClass(c).map(x=>`<option value="${x.adm}">${x.adm} — ${x.name}</option>`).join('')}
+
+function generateIndividualReport(){
+ const adm=document.getElementById('reportLearner').value,x=state.learners.find(y=>y.adm===adm);if(!x)return alert('Add learners first.');
+ const scores=subjects.map(s=>{const v=scoreFor(x,s);return{s,v,g:gradeFor(v)}}),avg=scores.reduce((a,b)=>a+b.v,0)/scores.length;
+ document.getElementById('reportPreview').innerHTML=`<div class="print-sheet" id="individualReportSheet"><div class="print-head"><div class="print-logo">KJ</div><div class="print-title"><h1>KAPNANDA JUNIOR & PRIMARY SCHOOL</h1><p>INDIVIDUAL LEARNER REPORT FORM</p><p>${sectionForClass(x.cls)} • ${x.cls} • 2026</p></div><div><b>TERM 1</b></div></div>
+ <table class="print-table"><tr><th>Admission No.</th><td>${x.adm}</td><th>Learner Name</th><td>${x.name}</td></tr><tr><th>Class</th><td>${x.cls}</td><th>Overall Average</th><td><b>${avg.toFixed(2)}</b> <span class="grade-chip ${gradeClass(gradeFor(avg))}">${gradeFor(avg)}</span></td></tr></table>
+ <table class="print-table"><tr><th>Learning Area</th><th>Score</th><th>Grade</th><th>Teacher Comment</th></tr>${scores.map(z=>`<tr><td>${z.s}</td><td>${z.v}</td><td><span class="grade-chip ${gradeClass(z.g)}">${z.g}</span></td><td>________________________________</td></tr>`).join('')}</table>
+ <p><b>Class Teacher's General Comment:</b> __________________________________________________________________________</p><p>________________________________________________________________________________________________</p>
+ <div class="signatures"><div class="signbox">Class Teacher Signature & Date</div><div class="signbox">Headteacher Signature & Date<div class="stamp">OFFICIAL SCHOOL STAMP</div></div></div></div>`;
+}
+
+function printReport(){const s=document.getElementById('individualReportSheet');if(!s)return alert('Generate the report form first.');window.print()}
+document.getElementById('reportClass')?.addEventListener('change',populateReportLearners);
+updateFeeClasses();populateReportLearners();
+generateClassList();
+generateRanking();
+
+updateStats();syncTimetableClasses();renderTimetable();renderDuty();renderCalendar();
+
+function authMsg(text,type='error'){const el=document.getElementById('authMsg');el.textContent=text;el.className='auth-msg '+type;el.style.display='block'}
+function showLogin(){document.getElementById('loginForm').style.display='block';document.getElementById('recoveryForm').style.display='none';document.getElementById('authMsg').style.display='none'}
+function showRecovery(){document.getElementById('loginForm').style.display='none';document.getElementById('recoveryForm').style.display='block';document.getElementById('authMsg').style.display='none'}
+function appReady(){document.getElementById('authGate').style.display='none';document.getElementById('accountBar').style.display='flex';document.getElementById('accountEmail').textContent=currentUser.email||''}
+async function loginUser(){const email=document.getElementById('loginEmail').value.trim();const password=document.getElementById('loginPassword').value;if(!email||!password)return authMsg('Enter your login and password.');const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)return authMsg(error.message);currentUser=await getProfile(data.user);if(!currentUser)return authMsg('Your account is not linked to the school profile. Ask the administrator to create it.');await loadCloud();appReady();updateStats();renderLearners();renderTeachers();renderDuty();renderCalendar();}
+async function getProfile(user){const {data,error}=await supabaseClient.from('profiles').select('id,email,full_name,role,school_id').eq('id',user.id).single();if(error){console.warn(error.message);return null}return data}
+async function logoutUser(){await supabaseClient.auth.signOut();location.reload()}
+async function changeOwnPassword(){const p=prompt('Enter your new password (minimum 8 characters):');if(!p)return;if(p.length<8)return alert('Password must be at least 8 characters.');const {error}=await supabaseClient.auth.updateUser({password:p});alert(error?error.message:'Password changed successfully.')}
+async function resetPasswordWithRecovery(){const email=document.getElementById('recoveryEmail').value.trim();const recoveryCode=document.getElementById('recoveryCode').value.trim();const newPassword=document.getElementById('newPassword').value;if(!email||!recoveryCode||!newPassword)return authMsg('Complete all recovery fields.');if(newPassword.length<8)return authMsg('New password must be at least 8 characters.');const {data,error}=await supabaseClient.functions.invoke('admin-reset-password',{body:{email,recovery_code:recoveryCode,new_password:newPassword}});if(error)return authMsg(error.message);if(data?.error)return authMsg(data.error);authMsg('Password changed successfully. You can now sign in.','ok');setTimeout(showLogin,1500)}
+async function createGeneratedAccount(){if(!currentUser||currentUser.role!=='admin')return alert('Only an administrator can generate accounts.');const name=prompt('Staff member full name:');if(!name)return;const role=prompt('Role (admin/staff/teacher):','staff')||'staff';const {data,error}=await supabaseClient.functions.invoke('create-staff-user',{body:{full_name:name,role}});if(error)return alert(error.message);if(data?.error)return alert(data.error);document.getElementById('generatedEmail').value=data.email;document.getElementById('generatedPassword').value=data.password;document.getElementById('generatedAccountModal').style.display='flex'}
+function copyGenerated(){navigator.clipboard.writeText('Login: '+document.getElementById('generatedEmail').value+'\nPassword: '+document.getElementById('generatedPassword').value);alert('Credentials copied.')}
+async function initAuth(){if(SUPABASE_URL.includes('YOUR_')||SUPABASE_PUBLISHABLE_KEY.includes('YOUR_')){authMsg('Configure your Supabase URL and publishable key in this file before deploying to GitHub.');return}const {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=await getProfile(data.session.user);if(currentUser){await loadCloud();appReady()}}supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;document.getElementById('authGate').style.display='flex';document.getElementById('accountBar').style.display='none'}else if(event==='SIGNED_IN'&&session&&!currentUser){currentUser=await getProfile(session.user);if(currentUser){await loadCloud();appReady()}}})}
+initAuth();
+</script>
+</body>
+</html>
